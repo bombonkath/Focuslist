@@ -1,6 +1,6 @@
 # To-Do Bliss - Aplicación de Lista de Tareas
 
-Una aplicación moderna y elegante para gestionar tareas diarias, inspirada en el diseño de la imagen proporcionada.
+Una aplicación moderna y elegante para gestionar tareas diarias inspirada como una herramienta de uso diario.
 
 ## 🚀 Características
 
@@ -25,7 +25,6 @@ app de lista de tareas/
 
 ## 🎨 Diseño
 
-La aplicación replica fielmente el diseño mostrado en la imagen, incluyendo:
 
 - **Header**: Logo, barra de búsqueda, notificaciones y perfil de usuario
 - **Sidebar Izquierdo**: Listas (Hoy, Próximas, Todas) y categorías

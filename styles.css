@@ -104,10 +104,7 @@ body {
     width: 250px;
     background-color: #E6E6FA;
     padding: 2rem 1.5rem;
-    position: fixed;
-    left: 0;
-    top: 80px;
-    height: calc(100vh - 80px);
+    flex-shrink: 0;
     overflow-y: auto;
 }
 
@@ -193,9 +190,9 @@ body {
 .main-content {
     flex: 1;
     background-color: #ffffff;
-    margin-left: 250px;
     padding: 2rem;
     min-height: calc(100vh - 80px);
+    overflow-y: auto;
 }
 
 .content-header {
@@ -374,10 +371,7 @@ body {
     width: 300px;
     background-color: #E6E6FA;
     padding: 2rem 1.5rem;
-    position: fixed;
-    right: 0;
-    top: 80px;
-    height: calc(100vh - 80px);
+    flex-shrink: 0;
     overflow-y: auto;
 }
 
@@ -500,19 +494,11 @@ body {
     .sidebar-right {
         display: none;
     }
-    
-    .main-content {
-        margin-right: 0;
-    }
 }
 
 @media (max-width: 768px) {
     .sidebar-left {
         display: none;
-    }
-    
-    .main-content {
-        margin-left: 0;
     }
     
     .header-right {

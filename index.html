@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do Bliss</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <i class="fas fa-circle" style="color: #ff69b4;"></i>
+                <span class="app-title">To-Do Bliss</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar tareas...">
+            </div>
+            <div class="notification-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-profile">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar-left">
+            <div class="sidebar-section">
+                <h3>Listas</h3>
+                <div class="list-item active">
+                    <i class="fas fa-sun"></i>
+                    <span>Hoy</span>
+                    <span class="count">3</span>
+                </div>
+                <div class="list-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Próximas</span>
+                    <span class="count">8</span>
+                </div>
+                <div class="list-item">
+                    <i class="fas fa-folder"></i>
+                    <span>Todas</span>
+                    <span class="count">12</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Categorías</h3>
+                <div class="category-item">
+                    <div class="color-dot" style="background-color: #ff69b4;"></div>
+                    <span>Personal</span>
+                </div>
+                <div class="category-item">
+                    <div class="color-dot" style="background-color: #90EE90;"></div>
+                    <span>Trabajo</span>
+                </div>
+                <div class="category-item">
+                    <div class="color-dot" style="background-color: #FFD700;"></div>
+                    <span>Mandados</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <div class="title-section">
+                    <h1>Hoy</h1>
+                    <p>Mantenlo simple. Enfócate en lo que más importa hoy.</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn">
+                        <i class="fas fa-sort"></i>
+                        Ordenar
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-filter"></i>
+                        Filtro
+                    </button>
+                </div>
+            </div>
+
+            <div class="add-task-section">
+                <input type="text" placeholder="+ Añadir una nueva tarea..." class="task-input">
+                <button class="add-btn">+ Añadir</button>
+            </div>
+
+            <div class="tasks-container">
+                <div class="task-item">
+                    <div class="task-checkbox">
+                        <i class="far fa-circle"></i>
+                    </div>
+                    <div class="task-content">
+                        <span class="task-text">Pagar la factura de electricidad</span>
+                        <div class="task-tags">
+                            <span class="tag" style="background-color: #ffb6c1;">Hogar</span>
+                            <span class="tag" style="background-color: #FFD700;">Vence hoy</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <i class="fas fa-pencil-alt"></i>
+                        <i class="fas fa-trash"></i>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-checkbox">
+                        <i class="far fa-circle"></i>
+                    </div>
+                    <div class="task-content">
+                        <span class="task-text">Terminar borrador del brief del proyecto</span>
+                        <div class="task-tags">
+                            <span class="tag" style="background-color: #DDA0DD;">Trabajo</span>
+                            <span class="tag" style="background-color: #ffb6c1;">Mañana</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <i class="fas fa-pencil-alt"></i>
+                        <i class="fas fa-trash"></i>
+                    </div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-checkbox">
+                        <i class="far fa-circle"></i>
+                    </div>
+                    <div class="task-content">
+                        <span class="task-text">Comprar alimentos para la cena</span>
+                        <div class="task-tags">
+                            <span class="tag" style="background-color: #ffb6c1;">Mandados</span>
+                            <span class="tag" style="background-color: #ffb6c1;">Esta semana</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <i class="fas fa-pencil-alt"></i>
+                        <i class="fas fa-trash"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="no-tasks-message">
+                ¡No hay más tareas para hoy. ¡Todo al día!
+            </div>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="sidebar-right">
+            <div class="sidebar-card">
+                <h3>Añadido rápido</h3>
+                <div class="quick-add">
+                    <input type="text" placeholder="# Título de la tarea, p. ej., &quot;Regar las plantas&quot;">
+                    <button class="quick-add-btn">Añadir</button>
+                </div>
+                <div class="quick-add-info">
+                    <p>Lista por defecto Hoy</p>
+                    <p>Auto-archivar hechas Activado</p>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Próximos</h3>
+                <div class="upcoming-list">
+                    <div class="upcoming-item">
+                        <span>Notas de la reunión</span>
+                        <span class="date">Sep 30</span>
+                    </div>
+                    <div class="upcoming-item">
+                        <span>Servicio del coche</span>
+                        <span class="date">Oct 02</span>
+                    </div>
+                    <div class="upcoming-item">
+                        <span>Cumpleaños de mamá</span>
+                        <span class="date">Oct 05</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Consejos</h3>
+                <p>Usa categorías para mantener las tareas ordenadas. Puedes editar, eliminar o completar tareas en cualquier momento.</p>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Floating Bottom Bar -->
+    <div class="floating-bar">
+        <div class="floating-content">
+            <p>A↑ > Edit To-Do Dashboard</p>
+            <p>What do you want to edit or add to the screen?</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

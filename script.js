@@ -35,6 +35,7 @@ function initializeApp() {
     setupEventListeners();
     renderTasks();
     updateTaskCounts();
+    setupMobileMenu();
 }
 
 // Event Listeners
@@ -351,6 +352,32 @@ function addHoverEffects() {
             this.style.transform = 'translateY(0)';
         });
     });
+}
+
+// Mobile Menu Functions
+function setupMobileMenu() {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebarLeft = document.querySelector('.sidebar-left');
+    
+    if (mobileMenuBtn && sidebarLeft) {
+        mobileMenuBtn.addEventListener('click', function() {
+            sidebarLeft.classList.toggle('mobile-visible');
+        });
+        
+        // Cerrar menú al hacer click fuera
+        document.addEventListener('click', function(e) {
+            if (!sidebarLeft.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                sidebarLeft.classList.remove('mobile-visible');
+            }
+        });
+        
+        // Cerrar menú al redimensionar ventana
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                sidebarLeft.classList.remove('mobile-visible');
+            }
+        });
+    }
 }
 
 // Inicializar efectos después del renderizado

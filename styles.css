@@ -551,31 +551,43 @@ body {
 
 /* Large tablets and small desktops */
 @media (max-width: 1200px) {
-    .main-container {
-        flex-direction: column;
-    }
-    
-    .sidebar-left {
-        width: 100%;
-        height: auto;
-        padding: 1rem;
-        order: 2;
+    .sidebar-right {
+        width: 280px;
     }
     
     .main-content {
-        order: 1;
-        margin-top: 0;
-    }
-    
-    .sidebar-right {
-        width: 100%;
-        order: 3;
-        padding: 1rem;
+        margin-right: 0;
     }
 }
 
 /* Tablets */
 @media (max-width: 1024px) {
+    .sidebar-right {
+        position: fixed;
+        top: 80px;
+        right: 0;
+        width: 300px;
+        height: calc(100vh - 80px);
+        background-color: #E6E6FA;
+        padding: 2rem 1.5rem;
+        z-index: 999;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+    }
+    
+    .sidebar-right.mobile-visible {
+        transform: translateX(0);
+    }
+    
+    .mobile-sidebar-btn {
+        display: block;
+    }
+    
+    .main-content {
+        margin-right: 0;
+    }
+    
     .header {
         padding: 1rem 1.5rem;
     }

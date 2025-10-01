@@ -357,27 +357,74 @@ function addHoverEffects() {
 // Mobile Menu Functions
 function setupMobileMenu() {
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileSidebarBtn = document.getElementById('mobileSidebarBtn');
     const sidebarLeft = document.querySelector('.sidebar-left');
+    const sidebarRight = document.querySelector('.sidebar-right');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    function updateOverlay() {
+        const isLeftOpen = sidebarLeft && sidebarLeft.classList.contains('mobile-visible');
+        const isRightOpen = sidebarRight && sidebarRight.classList.contains('mobile-visible');
+        
+        if (overlay) {
+            if (isLeftOpen || isRightOpen) {
+                overlay.classList.add('visible');
+            } else {
+                overlay.classList.remove('visible');
+            }
+        }
+    }
     
     if (mobileMenuBtn && sidebarLeft) {
         mobileMenuBtn.addEventListener('click', function() {
             sidebarLeft.classList.toggle('mobile-visible');
-        });
-        
-        // Cerrar menú al hacer click fuera
-        document.addEventListener('click', function(e) {
-            if (!sidebarLeft.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                sidebarLeft.classList.remove('mobile-visible');
+            // Cerrar sidebar derecho si está abierto
+            if (sidebarRight) {
+                sidebarRight.classList.remove('mobile-visible');
             }
-        });
-        
-        // Cerrar menú al redimensionar ventana
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                sidebarLeft.classList.remove('mobile-visible');
-            }
+            updateOverlay();
         });
     }
+    
+    if (mobileSidebarBtn && sidebarRight) {
+        mobileSidebarBtn.addEventListener('click', function() {
+            sidebarRight.classList.toggle('mobile-visible');
+            // Cerrar sidebar izquierdo si está abierto
+            if (sidebarLeft) {
+                sidebarLeft.classList.remove('mobile-visible');
+            }
+            updateOverlay();
+        });
+    }
+    
+    // Cerrar menús al hacer click en el overlay
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            if (sidebarLeft) sidebarLeft.classList.remove('mobile-visible');
+            if (sidebarRight) sidebarRight.classList.remove('mobile-visible');
+            updateOverlay();
+        });
+    }
+    
+    // Cerrar menús al hacer click fuera
+    document.addEventListener('click', function(e) {
+        if (sidebarLeft && !sidebarLeft.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+            sidebarLeft.classList.remove('mobile-visible');
+        }
+        if (sidebarRight && !sidebarRight.contains(e.target) && !mobileSidebarBtn.contains(e.target)) {
+            sidebarRight.classList.remove('mobile-visible');
+        }
+        updateOverlay();
+    });
+    
+    // Cerrar menús al redimensionar ventana
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            if (sidebarLeft) sidebarLeft.classList.remove('mobile-visible');
+            if (sidebarRight) sidebarRight.classList.remove('mobile-visible');
+            updateOverlay();
+        }
+    });
 }
 
 // Inicializar efectos después del renderizado

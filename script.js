@@ -5,21 +5,45 @@ let tasks = [
         text: "Pagar la factura de electricidad",
         completed: false,
         tags: ["Hogar", "Vence hoy"],
-        category: "Personal"
+        category: "Personal",
+        dueDate: new Date().toISOString().split('T')[0], // Hoy
+        priority: "high"
     },
     {
         id: 2,
         text: "Terminar borrador del brief del proyecto",
         completed: false,
         tags: ["Trabajo", "Mañana"],
-        category: "Trabajo"
+        category: "Trabajo",
+        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Mañana
+        priority: "medium"
     },
     {
         id: 3,
         text: "Comprar alimentos para la cena",
         completed: false,
         tags: ["Mandados", "Esta semana"],
-        category: "Mandados"
+        category: "Mandados",
+        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // En 3 días
+        priority: "low"
+    },
+    {
+        id: 4,
+        text: "Revisar notas de la reunión",
+        completed: false,
+        tags: ["Trabajo"],
+        category: "Trabajo",
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // En 1 semana
+        priority: "medium"
+    },
+    {
+        id: 5,
+        text: "Llamar al dentista",
+        completed: true,
+        tags: ["Personal"],
+        category: "Personal",
+        dueDate: new Date().toISOString().split('T')[0], // Hoy (completada)
+        priority: "low"
     }
 ];
 
@@ -36,6 +60,23 @@ function initializeApp() {
     renderTasks();
     updateTaskCounts();
     setupMobileMenu();
+    setupDateInputs();
+}
+
+function setupDateInputs() {
+    const today = new Date().toISOString().split('T')[0];
+    const taskDateInput = document.getElementById('taskDate');
+    const quickTaskDateInput = document.getElementById('quickTaskDate');
+    
+    if (taskDateInput) {
+        taskDateInput.value = today;
+        taskDateInput.min = today; // No permitir fechas pasadas
+    }
+    
+    if (quickTaskDateInput) {
+        quickTaskDateInput.value = today;
+        quickTaskDateInput.min = today; // No permitir fechas pasadas
+    }
 }
 
 // Event Listeners
@@ -93,7 +134,9 @@ function setupEventListeners() {
 // Funciones de tareas
 function addNewTask() {
     const taskInput = document.querySelector('.task-input');
+    const dateInput = document.getElementById('taskDate');
     const taskText = taskInput.value.trim();
+    const selectedDate = dateInput.value;
     
     if (taskText) {
         const newTask = {
@@ -101,11 +144,14 @@ function addNewTask() {
             text: taskText,
             completed: false,
             tags: ["Personal"],
-            category: "Personal"
+            category: "Personal",
+            dueDate: selectedDate || new Date().toISOString().split('T')[0], // Usar fecha seleccionada o hoy por defecto
+            priority: "medium"
         };
         
         tasks.push(newTask);
         taskInput.value = '';
+        dateInput.value = ''; // Limpiar el selector de fecha
         renderTasks();
         updateTaskCounts();
         showNotification('Tarea añadida correctamente');
@@ -113,8 +159,10 @@ function addNewTask() {
 }
 
 function addQuickTask() {
-    const quickInput = document.querySelector('.quick-add input');
+    const quickInput = document.querySelector('.quick-add input[type="text"]');
+    const quickDateInput = document.getElementById('quickTaskDate');
     const taskText = quickInput.value.trim();
+    const selectedDate = quickDateInput.value;
     
     if (taskText) {
         const newTask = {
@@ -122,11 +170,14 @@ function addQuickTask() {
             text: taskText,
             completed: false,
             tags: ["Personal"],
-            category: "Personal"
+            category: "Personal",
+            dueDate: selectedDate || new Date().toISOString().split('T')[0], // Usar fecha seleccionada o hoy por defecto
+            priority: "medium"
         };
         
         tasks.push(newTask);
         quickInput.value = '';
+        quickDateInput.value = ''; // Limpiar el selector de fecha
         renderTasks();
         updateTaskCounts();
         showNotification('Tarea añadida correctamente');
@@ -182,6 +233,7 @@ function renderTasks() {
                 <span class="task-text" style="text-decoration: ${task.completed ? 'line-through' : 'none'}; opacity: ${task.completed ? '0.6' : '1'}">${task.text}</span>
                 <div class="task-tags">
                     ${task.tags.map(tag => `<span class="tag" style="background-color: ${getTagColor(tag)};">${tag}</span>`).join('')}
+                    <span class="tag" style="background-color: ${getDueDateColor(task.dueDate)};">${formatDueDate(task.dueDate)}</span>
                 </div>
             </div>
             <div class="task-actions">
@@ -196,14 +248,20 @@ function getFilteredTasks() {
     let filtered = tasks;
     
     // Filtrar por lista
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
     switch(currentFilter) {
         case 'Hoy':
-            filtered = tasks.filter(task => !task.completed);
+            // Tareas que vencen hoy (completadas y pendientes)
+            filtered = tasks.filter(task => task.dueDate === today);
             break;
         case 'Próximas':
-            filtered = tasks.filter(task => !task.completed);
+            // Tareas que vencen en el futuro (solo pendientes)
+            filtered = tasks.filter(task => !task.completed && task.dueDate > today);
             break;
         case 'Todas':
+            // Todas las tareas
             filtered = tasks;
             break;
     }
@@ -283,9 +341,67 @@ function getTagColor(tag) {
     return colors[tag] || '#e0e0e0';
 }
 
+function formatDueDate(dueDate) {
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const taskDate = new Date(dueDate);
+    const todayDate = new Date(today);
+    
+    if (dueDate === today) {
+        return 'Hoy';
+    } else if (dueDate === tomorrow) {
+        return 'Mañana';
+    } else {
+        const diffTime = taskDate - todayDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) {
+            return `Hace ${Math.abs(diffDays)} día${Math.abs(diffDays) !== 1 ? 's' : ''}`;
+        } else if (diffDays <= 7) {
+            return `En ${diffDays} día${diffDays !== 1 ? 's' : ''}`;
+        } else {
+            return taskDate.toLocaleDateString('es-ES', { 
+                day: 'numeric', 
+                month: 'short' 
+            });
+        }
+    }
+}
+
+function getDueDateColor(dueDate) {
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const taskDate = new Date(dueDate);
+    const todayDate = new Date(today);
+    
+    if (dueDate === today) {
+        return '#FF6B6B'; // Rojo para hoy
+    } else if (dueDate === tomorrow) {
+        return '#FFD93D'; // Amarillo para mañana
+    } else {
+        const diffTime = taskDate - todayDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) {
+            return '#FF4757'; // Rojo oscuro para vencidas
+        } else if (diffDays <= 3) {
+            return '#FFA502'; // Naranja para próximas
+        } else {
+            return '#2ED573'; // Verde para futuras
+        }
+    }
+}
+
 function updateTaskCounts() {
-    const todayCount = tasks.filter(t => !t.completed).length;
-    const upcomingCount = tasks.filter(t => !t.completed).length;
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Tareas que vencen hoy (completadas y pendientes)
+    const todayCount = tasks.filter(t => t.dueDate === today).length;
+    
+    // Tareas que vencen en el futuro (solo pendientes)
+    const upcomingCount = tasks.filter(t => !t.completed && t.dueDate > today).length;
+    
+    // Todas las tareas
     const allCount = tasks.length;
     
     const counts = document.querySelectorAll('.count');

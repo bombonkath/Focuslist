@@ -49,6 +49,7 @@ let tasks = [
 
 let currentFilter = 'Hoy';
 let currentSort = 'default';
+let currentCategoryFilter = null; // null = todas las categorías
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
@@ -117,6 +118,20 @@ function setupEventListeners() {
         });
     });
 
+    // Filtros de categoría
+    const categoryItems = document.querySelectorAll('.category-item');
+    categoryItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // Remover clase active de todas las categorías
+            categoryItems.forEach(ci => ci.classList.remove('active'));
+            // Agregar clase active al clickeado
+            this.classList.add('active');
+            
+            const categoryName = this.querySelector('span').textContent;
+            filterByCategory(categoryName);
+        });
+    });
+
     // Botones de ordenar y filtrar
     const sortBtn = document.querySelector('.action-btn:first-child');
     const filterBtn = document.querySelector('.action-btn:last-child');
@@ -135,23 +150,25 @@ function setupEventListeners() {
 function addNewTask() {
     const taskInput = document.querySelector('.task-input');
     const dateInput = document.getElementById('taskDate');
+    const categorySelect = document.getElementById('taskCategory');
     const taskText = taskInput.value.trim();
     const selectedDate = dateInput.value;
+    const selectedCategory = categorySelect ? categorySelect.value : 'Personal';
     
     if (taskText) {
         const newTask = {
             id: Date.now(),
             text: taskText,
             completed: false,
-            tags: ["Personal"],
-            category: "Personal",
+            tags: [selectedCategory],
+            category: selectedCategory,
             dueDate: selectedDate || new Date().toISOString().split('T')[0], // Usar fecha seleccionada o hoy por defecto
             priority: "medium"
         };
         
         tasks.push(newTask);
         taskInput.value = '';
-        dateInput.value = ''; // Limpiar el selector de fecha
+        dateInput.value = ''; // Limpiar el selector de fecha pero mantener la categoría
         renderTasks();
         updateTaskCounts();
         showNotification('Tarea añadida correctamente');
@@ -161,23 +178,25 @@ function addNewTask() {
 function addQuickTask() {
     const quickInput = document.querySelector('.quick-add input[type="text"]');
     const quickDateInput = document.getElementById('quickTaskDate');
+    const quickCategorySelect = document.getElementById('quickTaskCategory');
     const taskText = quickInput.value.trim();
     const selectedDate = quickDateInput.value;
+    const selectedCategory = quickCategorySelect ? quickCategorySelect.value : 'Personal';
     
     if (taskText) {
         const newTask = {
             id: Date.now(),
             text: taskText,
             completed: false,
-            tags: ["Personal"],
-            category: "Personal",
+            tags: [selectedCategory],
+            category: selectedCategory,
             dueDate: selectedDate || new Date().toISOString().split('T')[0], // Usar fecha seleccionada o hoy por defecto
             priority: "medium"
         };
         
         tasks.push(newTask);
         quickInput.value = '';
-        quickDateInput.value = ''; // Limpiar el selector de fecha
+        quickDateInput.value = ''; // Limpiar el selector de fecha pero mantener la categoría
         renderTasks();
         updateTaskCounts();
         showNotification('Tarea añadida correctamente');
@@ -218,11 +237,6 @@ function editTask(taskId) {
 function renderTasks() {
     const tasksContainer = document.querySelector('.tasks-container');
     const filteredTasks = getFilteredTasks();
-    
-    if (filteredTasks.length === 0) {
-        tasksContainer.innerHTML = '<div class="no-tasks-message">¡No hay más tareas para hoy. ¡Todo al día!</div>';
-        return;
-    }
     
     tasksContainer.innerHTML = filteredTasks.map(task => `
         <div class="task-item ${task.completed ? 'completed' : ''}">
@@ -266,6 +280,11 @@ function getFilteredTasks() {
             break;
     }
     
+    // Filtrar por categoría si hay un filtro activo
+    if (currentCategoryFilter) {
+        filtered = filtered.filter(task => task.category === currentCategoryFilter);
+    }
+    
     // Ordenar
     switch(currentSort) {
         case 'alphabetical':
@@ -288,6 +307,18 @@ function getFilteredTasks() {
 
 function filterTasks(filterName) {
     currentFilter = filterName;
+    renderTasks();
+}
+
+function filterByCategory(categoryName) {
+    // Si se hace click en la misma categoría, quitar el filtro
+    if (currentCategoryFilter === categoryName) {
+        currentCategoryFilter = null;
+        // Remover clase active de todas las categorías
+        document.querySelectorAll('.category-item').forEach(ci => ci.classList.remove('active'));
+    } else {
+        currentCategoryFilter = categoryName;
+    }
     renderTasks();
 }
 

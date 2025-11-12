@@ -145,6 +145,22 @@ body {
     background-color: #f0f0f0;
 }
 
+.logout-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.logout-btn:hover {
+    background-color: #f0f0f0;
+    color: #ff4757;
+}
+
 /* Main Container */
 .main-container {
     display: flex;

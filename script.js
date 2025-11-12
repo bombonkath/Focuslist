@@ -64,6 +64,22 @@ function initializeApp() {
     setupDateInputs();
     updateDailyProgress();
     updateUrgentTasks();
+    setupLogout();
+}
+
+function setupLogout() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                // Limpiar sesión
+                localStorage.removeItem('userData');
+                sessionStorage.removeItem('userData');
+                // Redirigir al login
+                window.location.href = 'login.html';
+            }
+        });
+    }
 }
 
 function setupDateInputs() {

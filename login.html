@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicia sesión - To-Do Bliss</title>
+    <link rel="stylesheet" href="login.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="login-header">
+        <div class="header-left">
+            <div class="logo">
+                <i class="fas fa-circle" style="color: #ff69b4;"></i>
+                <span class="app-title">To-Do Bliss</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="help-btn">
+                <i class="fas fa-question-circle"></i>
+                <span>Ayuda</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Login Container -->
+    <main class="login-container">
+        <div class="login-card">
+            <h1 class="login-title">Inicia sesión</h1>
+            <p class="login-subtitle">Organiza tus tareas con una interfaz simple y agradable.</p>
+
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" name="email" placeholder="maria.lopez@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••••" required>
+                </div>
+
+                <div class="login-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <span>Recordarme</span>
+                    </label>
+                    <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Entrar</span>
+                </button>
+            </form>
+
+            <div class="separator">
+                <span>o continúa con</span>
+            </div>
+
+            <div class="social-login">
+                <button class="social-btn gmail-btn">
+                    <i class="fas fa-envelope"></i>
+                    <span>Gmail</span>
+                </button>
+                <button class="social-btn github-btn">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </button>
+            </div>
+
+            <div class="signup-link">
+                <span>¿No tienes cuenta?</span>
+                <a href="#" id="createAccountLink">Crear cuenta</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="login.js"></script>
+</body>
+</html>

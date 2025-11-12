@@ -1,0 +1,167 @@
+// Funcionalidad del Login
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    const createAccountLink = document.getElementById('createAccountLink');
+    const socialButtons = document.querySelectorAll('.social-btn');
+
+    // Manejar envío del formulario
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleLogin();
+        });
+    }
+
+    // Link para crear cuenta
+    if (createAccountLink) {
+        createAccountLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Por ahora solo muestra un mensaje, puedes implementar registro después
+            alert('Funcionalidad de registro próximamente');
+        });
+    }
+
+    // Botones de login social
+    socialButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const provider = this.classList.contains('gmail-btn') ? 'Gmail' : 'GitHub';
+            handleSocialLogin(provider);
+        });
+    });
+});
+
+function handleLogin() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const rememberMe = document.getElementById('rememberMe').checked;
+
+    // Validación básica
+    if (!email || !password) {
+        showError('Por favor, completa todos los campos');
+        return;
+    }
+
+    // Simulación de login (en producción esto sería una llamada a API)
+    // Por ahora, guardamos en localStorage y redirigimos
+    const userData = {
+        email: email,
+        rememberMe: rememberMe,
+        loginTime: new Date().toISOString()
+    };
+
+    // Guardar en localStorage
+    if (rememberMe) {
+        localStorage.setItem('userData', JSON.stringify(userData));
+    } else {
+        sessionStorage.setItem('userData', JSON.stringify(userData));
+    }
+
+    // Redirigir a la aplicación principal
+    window.location.href = 'index.html';
+}
+
+function handleSocialLogin(provider) {
+    // Simulación de login social
+    showNotification(`Iniciando sesión con ${provider}...`);
+    
+    // En producción, aquí iría la autenticación real con OAuth
+    setTimeout(() => {
+        const userData = {
+            email: `user@${provider.toLowerCase()}.com`,
+            provider: provider,
+            loginTime: new Date().toISOString()
+        };
+
+        sessionStorage.setItem('userData', JSON.stringify(userData));
+        window.location.href = 'index.html';
+    }, 1000);
+}
+
+function showError(message) {
+    // Crear elemento de error
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background-color: #ff4757;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    `;
+    errorDiv.textContent = message;
+    
+    document.body.appendChild(errorDiv);
+    
+    // Animar entrada
+    setTimeout(() => {
+        errorDiv.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+        errorDiv.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (document.body.contains(errorDiv)) {
+                document.body.removeChild(errorDiv);
+            }
+        }, 300);
+    }, 3000);
+}
+
+function showNotification(message) {
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background-color: #4CAF50;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Animar entrada
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Verificar si ya hay sesión activa
+function checkExistingSession() {
+    const userData = localStorage.getItem('userData') || sessionStorage.getItem('userData');
+    if (userData) {
+        // Si hay sesión, redirigir directamente a la app
+        // window.location.href = 'index.html';
+    }
+}
+
+// Ejecutar al cargar
+checkExistingSession();

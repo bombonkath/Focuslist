@@ -62,21 +62,17 @@ function initializeApp() {
     updateTaskCounts();
     setupMobileMenu();
     setupDateInputs();
+    updateDailyProgress();
+    updateUrgentTasks();
 }
 
 function setupDateInputs() {
     const today = new Date().toISOString().split('T')[0];
     const taskDateInput = document.getElementById('taskDate');
-    const quickTaskDateInput = document.getElementById('quickTaskDate');
     
     if (taskDateInput) {
         taskDateInput.value = today;
         taskDateInput.min = today; // No permitir fechas pasadas
-    }
-    
-    if (quickTaskDateInput) {
-        quickTaskDateInput.value = today;
-        quickTaskDateInput.min = today; // No permitir fechas pasadas
     }
 }
 
@@ -93,16 +89,6 @@ function setupEventListeners() {
         }
     });
 
-    // Quick add
-    const quickAddBtn = document.querySelector('.quick-add-btn');
-    const quickAddInput = document.querySelector('.quick-add input');
-    
-    quickAddBtn.addEventListener('click', addQuickTask);
-    quickAddInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            addQuickTask();
-        }
-    });
 
     // Filtros de lista
     const listItems = document.querySelectorAll('.list-item');
@@ -171,35 +157,93 @@ function addNewTask() {
         dateInput.value = ''; // Limpiar el selector de fecha pero mantener la categoría
         renderTasks();
         updateTaskCounts();
+        updateDailyProgress();
+        updateUrgentTasks();
         showNotification('Tarea añadida correctamente');
     }
 }
 
-function addQuickTask() {
-    const quickInput = document.querySelector('.quick-add input[type="text"]');
-    const quickDateInput = document.getElementById('quickTaskDate');
-    const quickCategorySelect = document.getElementById('quickTaskCategory');
-    const taskText = quickInput.value.trim();
-    const selectedDate = quickDateInput.value;
-    const selectedCategory = quickCategorySelect ? quickCategorySelect.value : 'Personal';
+// Funciones de progreso y urgentes
+function updateDailyProgress() {
+    const today = new Date().toISOString().split('T')[0];
+    const todayTasks = tasks.filter(task => task.dueDate === today);
+    const completedTasks = todayTasks.filter(task => task.completed);
+    const totalToday = todayTasks.length;
+    const completedToday = completedTasks.length;
+    const pendingToday = totalToday - completedToday;
     
-    if (taskText) {
-        const newTask = {
-            id: Date.now(),
-            text: taskText,
-            completed: false,
-            tags: [selectedCategory],
-            category: selectedCategory,
-            dueDate: selectedDate || new Date().toISOString().split('T')[0], // Usar fecha seleccionada o hoy por defecto
-            priority: "medium"
-        };
+    const percentage = totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0;
+    
+    // Actualizar porcentaje
+    const progressPercentage = document.getElementById('progressPercentage');
+    if (progressPercentage) {
+        progressPercentage.textContent = `${percentage}%`;
+    }
+    
+    // Actualizar círculo de progreso
+    const progressCircle = document.getElementById('progressCircle');
+    if (progressCircle) {
+        const degrees = (percentage / 100) * 360;
+        progressCircle.style.background = `conic-gradient(#DDA0DD ${degrees}deg, #e0e0e0 ${degrees}deg)`;
+    }
+    
+    // Actualizar estadísticas
+    const todayTotalEl = document.getElementById('todayTotal');
+    const todayCompletedEl = document.getElementById('todayCompleted');
+    const todayPendingEl = document.getElementById('todayPending');
+    
+    if (todayTotalEl) todayTotalEl.textContent = totalToday;
+    if (todayCompletedEl) todayCompletedEl.textContent = completedToday;
+    if (todayPendingEl) todayPendingEl.textContent = pendingToday;
+}
+
+function updateUrgentTasks() {
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
+    // Tareas que vencen hoy o mañana (solo pendientes)
+    const urgentTasks = tasks.filter(task => {
+        if (task.completed) return false;
+        return task.dueDate === today || task.dueDate === tomorrow;
+    }).sort((a, b) => {
+        // Primero las de hoy, luego las de mañana
+        if (a.dueDate === today && b.dueDate !== today) return -1;
+        if (a.dueDate !== today && b.dueDate === today) return 1;
+        return 0;
+    });
+    
+    const urgentList = document.getElementById('urgentList');
+    if (!urgentList) return;
+    
+    if (urgentTasks.length === 0) {
+        urgentList.innerHTML = '<div class="no-urgent">¡No hay tareas urgentes! 🎉</div>';
+        return;
+    }
+    
+    urgentList.innerHTML = urgentTasks.map(task => {
+        const isToday = task.dueDate === today;
+        const dateLabel = isToday ? 'Hoy' : 'Mañana';
+        const urgencyClass = isToday ? '' : 'soon';
         
-        tasks.push(newTask);
-        quickInput.value = '';
-        quickDateInput.value = ''; // Limpiar el selector de fecha pero mantener la categoría
-        renderTasks();
-        updateTaskCounts();
-        showNotification('Tarea añadida correctamente');
+        return `
+            <div class="urgent-item ${urgencyClass}" onclick="scrollToTask(${task.id})">
+                <span class="urgent-text">${task.text}</span>
+                <span class="urgent-date">${dateLabel}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function scrollToTask(taskId) {
+    // Scroll a la tarea en la lista principal
+    const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+    if (taskElement) {
+        taskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Resaltar temporalmente
+        taskElement.style.backgroundColor = '#fff9e6';
+        setTimeout(() => {
+            taskElement.style.backgroundColor = '';
+        }, 2000);
     }
 }
 
@@ -209,6 +253,8 @@ function toggleTaskComplete(taskId) {
         task.completed = !task.completed;
         renderTasks();
         updateTaskCounts();
+        updateDailyProgress();
+        updateUrgentTasks();
     }
 }
 
@@ -217,6 +263,8 @@ function deleteTask(taskId) {
         tasks = tasks.filter(t => t.id !== taskId);
         renderTasks();
         updateTaskCounts();
+        updateDailyProgress();
+        updateUrgentTasks();
         showNotification('Tarea eliminada');
     }
 }
@@ -228,6 +276,7 @@ function editTask(taskId) {
         if (newText && newText.trim()) {
             task.text = newText.trim();
             renderTasks();
+            updateUrgentTasks();
             showNotification('Tarea actualizada');
         }
     }
@@ -239,7 +288,7 @@ function renderTasks() {
     const filteredTasks = getFilteredTasks();
     
     tasksContainer.innerHTML = filteredTasks.map(task => `
-        <div class="task-item ${task.completed ? 'completed' : ''}">
+        <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
             <div class="task-checkbox" onclick="toggleTaskComplete(${task.id})">
                 <i class="${task.completed ? 'fas fa-check-circle' : 'far fa-circle'}"></i>
             </div>

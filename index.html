@@ -169,38 +169,35 @@
         <!-- Right Sidebar -->
         <aside class="sidebar-right">
             <div class="sidebar-card">
-                <h3>Añadido rápido</h3>
-                <div class="quick-add">
-                    <input type="text" placeholder="# Título de la tarea, p. ej., &quot;Regar las plantas&quot;">
-                    <input type="date" class="date-input" id="quickTaskDate">
-                    <select class="category-select" id="quickTaskCategory">
-                        <option value="Personal">Personal</option>
-                        <option value="Trabajo">Trabajo</option>
-                        <option value="Mandados">Mandados</option>
-                    </select>
-                    <button class="quick-add-btn">Añadir</button>
-                </div>
-                <div class="quick-add-info">
-                    <p>Lista por defecto Hoy</p>
-                    <p>Auto-archivar hechas Activado</p>
+                <h3>Progreso del día</h3>
+                <div class="progress-section">
+                    <div class="progress-circle" id="progressCircle">
+                        <div class="progress-text">
+                            <span class="progress-percentage" id="progressPercentage">0%</span>
+                            <span class="progress-label">Completado</span>
+                        </div>
+                    </div>
+                    <div class="progress-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="todayTotal">0</span>
+                            <span class="stat-label">Total hoy</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="todayCompleted">0</span>
+                            <span class="stat-label">Completadas</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="todayPending">0</span>
+                            <span class="stat-label">Pendientes</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="sidebar-card">
-                <h3>Próximos</h3>
-                <div class="upcoming-list">
-                    <div class="upcoming-item">
-                        <span>Notas de la reunión</span>
-                        <span class="date">Sep 30</span>
-                    </div>
-                    <div class="upcoming-item">
-                        <span>Servicio del coche</span>
-                        <span class="date">Oct 02</span>
-                    </div>
-                    <div class="upcoming-item">
-                        <span>Cumpleaños de mamá</span>
-                        <span class="date">Oct 05</span>
-                    </div>
+                <h3>Urgentes</h3>
+                <div class="urgent-list" id="urgentList">
+                    <!-- Se llenará dinámicamente -->
                 </div>
             </div>
 

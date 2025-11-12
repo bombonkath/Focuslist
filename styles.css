@@ -518,39 +518,134 @@ body {
     background-color: #e0e0e0;
 }
 
-.quick-add-info p {
-    font-size: 0.8rem;
-    color: #666;
-    margin-bottom: 0.25rem;
+/* Progress Section */
+.progress-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
 }
 
-.upcoming-list {
+.progress-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(#DDA0DD 0deg, #e0e0e0 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.progress-circle::before {
+    content: '';
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: white;
+}
+
+.progress-text {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.progress-percentage {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #DDA0DD;
+}
+
+.progress-label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.progress-stats {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    gap: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+/* Urgent Tasks */
+.urgent-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-.upcoming-item {
+.urgent-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background-color: #fff5f5;
+    border-left: 3px solid #FF6B6B;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.upcoming-item:last-child {
-    border-bottom: none;
+.urgent-item:hover {
+    background-color: #ffe0e0;
+    transform: translateX(4px);
 }
 
-.upcoming-item span:first-child {
+.urgent-item.soon {
+    background-color: #fff9e6;
+    border-left-color: #FFD93D;
+}
+
+.urgent-item.soon:hover {
+    background-color: #fff4cc;
+}
+
+.urgent-text {
+    flex: 1;
     color: #333;
     font-size: 0.9rem;
+    font-weight: 500;
 }
 
-.date {
+.urgent-date {
+    color: #FF6B6B;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.urgent-item.soon .urgent-date {
+    color: #FFA502;
+}
+
+.no-urgent {
+    text-align: center;
     color: #666;
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 1rem;
 }
 
 .sidebar-card p {

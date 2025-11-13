@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - To-Do Bliss</title>
+    <link rel="stylesheet" href="profile.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="profile-header">
+        <div class="header-left">
+            <div class="logo">
+                <i class="fas fa-circle" style="color: #ff69b4;"></i>
+                <span class="app-title">To-Do Bliss</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="nav-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Volver</span>
+            </button>
+            <button class="nav-btn" id="settingsBtn">
+                <i class="fas fa-cog"></i>
+                <span>Ajustes</span>
+            </button>
+            <div class="user-avatar">
+                <img src="https://ui-avatars.com/api/?name=María+López&background=ff69b4&color=fff" alt="María López" id="profileAvatar">
+            </div>
+        </div>
+    </header>
+
+    <div class="save-changes-bar">
+        <button class="save-btn" id="saveBtn">
+            <i class="fas fa-save"></i>
+            <span>Guardar cambios</span>
+        </button>
+    </div>
+
+    <div class="profile-container">
+        <!-- Left Sidebar -->
+        <aside class="profile-sidebar">
+            <h3>Perfil</h3>
+            <nav class="profile-nav">
+                <a href="#resumen" class="nav-item active" data-section="resumen">
+                    <i class="fas fa-user"></i>
+                    <span>Resumen</span>
+                </a>
+                <a href="#apariencia" class="nav-item" data-section="apariencia">
+                    <i class="fas fa-sparkles"></i>
+                    <span>Apariencia</span>
+                </a>
+                <a href="#notificaciones" class="nav-item" data-section="notificaciones">
+                    <i class="fas fa-bell"></i>
+                    <span>Notificaciones</span>
+                </a>
+                <a href="#seguridad" class="nav-item" data-section="seguridad">
+                    <i class="fas fa-lock"></i>
+                    <span>Seguridad</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="profile-content">
+            <div class="content-header">
+                <h1 id="profileName">Perfil de María López</h1>
+                <p>Gestiona tu información personal y preferencias.</p>
+            </div>
+
+            <!-- Resumen Section -->
+            <section class="profile-section active" id="resumen">
+                <!-- Información básica -->
+                <div class="section-card">
+                    <h2>Información básica</h2>
+                    <div class="profile-picture-section">
+                        <div class="profile-picture">
+                            <img src="https://ui-avatars.com/api/?name=María+López&background=ff69b4&color=fff&size=128" alt="María López" id="profilePicture">
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="displayName">María López</h3>
+                            <p id="displayEmail">kate16_94@hotmail.com</p>
+                            <button class="change-photo-btn">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Cambiar foto</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="firstName">Nombre</label>
+                            <input type="text" id="firstName" value="María">
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Apellidos</label>
+                            <input type="text" id="lastName" value="López">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Correo</label>
+                            <input type="email" id="email" value="kate16_94@hotmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="username">Usuario</label>
+                            <input type="text" id="username" value="@marialpz">
+                        </div>
+                        <div class="form-group">
+                            <label for="language">Idioma</label>
+                            <select id="language">
+                                <option value="es" selected>Español</option>
+                                <option value="en">English</option>
+                                <option value="fr">Français</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="timezone">Zona horaria</label>
+                            <select id="timezone">
+                                <option value="GMT-5" selected>GMT-5</option>
+                                <option value="GMT-6">GMT-6</option>
+                                <option value="GMT+0">GMT+0</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estadísticas rápidas -->
+                <div class="section-card">
+                    <h2>Estadísticas rápidas</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: #4CAF50;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="completedTasks">128</span>
+                                <span class="stat-label">Tareas completadas</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: #FFA502;">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="pendingTasks">7</span>
+                                <span class="stat-label">Pendientes</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background-color: #DDA0DD;">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="streakDays">12</span>
+                                <span class="stat-label">Racha (días)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Apariencia Section -->
+            <section class="profile-section" id="apariencia">
+                <div class="section-card">
+                    <h2>Apariencia</h2>
+                    <div class="settings-list">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">Tema</span>
+                                <span class="setting-description">Elige entre tema claro u oscuro</span>
+                            </div>
+                            <div class="setting-value">
+                                <span class="badge">
+                                    <i class="fas fa-sun"></i>
+                                    Claro
+                                </span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">Color de acento</span>
+                                <span class="setting-description">Personaliza el color principal</span>
+                            </div>
+                            <div class="setting-value">
+                                <span class="badge">Pastel</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">Animaciones</span>
+                                <span class="setting-description">Controla las animaciones de la interfaz</span>
+                            </div>
+                            <div class="setting-value">
+                                <span class="badge">Suaves</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notificaciones Section -->
+            <section class="profile-section" id="notificaciones">
+                <div class="section-card">
+                    <h2>Notificaciones</h2>
+                    <div class="settings-list">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">Recordatorios diarios</span>
+                                <span class="setting-description">Recibe recordatorios de tus tareas pendientes</span>
+                            </div>
+                            <div class="setting-value">
+                                <span class="badge active">Activados</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">Resumen semanal</span>
+                                <span class="setting-description">Recibe un resumen de tu actividad semanal</span>
+                            </div>
+                            <div class="setting-value">
+                                <span class="badge active">Activado</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">Correo de actividad</span>
+                                <span class="setting-description">Recibe notificaciones por correo electrónico</span>
+                            </div>
+                            <div class="setting-value">
+                                <span class="badge">Desactivado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seguridad Section -->
+            <section class="profile-section" id="seguridad">
+                <div class="section-card">
+                    <h2>Seguridad</h2>
+                    <div class="settings-list">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <span class="setting-label">Sesiones activas</span>
+                                <span class="setting-description">Dispositivos donde has iniciado sesión</span>
+                            </div>
+                            <div class="setting-value">
+                                <span class="badge">3 dispositivos</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="danger-zone">
+                        <button class="danger-btn" id="deleteAccountBtn">
+                            <i class="fas fa-trash"></i>
+                            <span>Eliminar cuenta</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Integraciones -->
+                <div class="section-card">
+                    <h2>Integraciones</h2>
+                    <div class="settings-list">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <i class="fas fa-calendar setting-icon"></i>
+                                <div>
+                                    <span class="setting-label">Calendario</span>
+                                    <span class="setting-description">Sincroniza tus tareas con tu calendario</span>
+                                </div>
+                            </div>
+                            <div class="setting-value">
+                                <span class="badge active">Conectado</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <i class="fas fa-envelope setting-icon"></i>
+                                <div>
+                                    <span class="setting-label">Correo</span>
+                                    <span class="setting-description">Recibe notificaciones por correo</span>
+                                </div>
+                            </div>
+                            <div class="setting-value">
+                                <span class="badge">No conectado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="profile-sidebar-right">
+            <div class="sidebar-card">
+                <h3>Acciones rápidas</h3>
+                <div class="quick-actions">
+                    <div class="quick-action-item">
+                        <span>Editar nombre</span>
+                        <button class="action-link">Abrir</button>
+                    </div>
+                    <div class="quick-action-item">
+                        <span>Cambiar contraseña</span>
+                        <button class="action-link">Abrir</button>
+                    </div>
+                    <div class="quick-action-item">
+                        <span>Preferencias de tema</span>
+                        <button class="action-link">Abrir</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Consejos</h3>
+                <p>Personaliza tu experiencia con categorías y atajos. Mantén tu perfil actualizado para sincronizar mejor en dispositivos.</p>
+            </div>
+        </aside>
+    </div>
+
+    <script src="profile.js"></script>
+</body>
+</html>

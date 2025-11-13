@@ -139,10 +139,15 @@ body {
     padding: 0.5rem;
     border-radius: 50%;
     transition: background-color 0.2s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .notification-icon:hover, .user-profile:hover {
     background-color: #f0f0f0;
+    color: #DDA0DD;
 }
 
 .logout-btn {

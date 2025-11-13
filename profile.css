@@ -89,30 +89,17 @@ body {
     object-fit: cover;
 }
 
-/* Save Changes Bar */
-.save-changes-bar {
-    position: fixed;
-    top: 80px;
-    left: 0;
-    right: 0;
-    background-color: #ffffff;
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    z-index: 999;
-    display: flex;
-    justify-content: flex-end;
-}
-
+/* Save Button in Header */
 .save-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1rem;
     background-color: #DDA0DD;
     color: white;
     border: none;
-    border-radius: 12px;
-    font-size: 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -127,8 +114,8 @@ body {
 /* Profile Container */
 .profile-container {
     display: flex;
-    margin-top: 140px;
-    min-height: calc(100vh - 140px);
+    margin-top: 64px;
+    min-height: calc(100vh - 64px);
     height: auto;
 }
 
@@ -140,8 +127,8 @@ body {
     flex-shrink: 0;
     position: fixed;
     left: 0;
-    top: 140px;
-    height: calc(100vh - 140px);
+    top: 64px;
+    height: calc(100vh - 64px);
     overflow-y: auto;
 }
 
@@ -193,7 +180,7 @@ body {
     margin-right: 300px;
     padding: 2rem;
     padding-bottom: 4rem;
-    min-height: calc(100vh - 140px);
+    min-height: calc(100vh - 64px);
     overflow-y: auto;
 }
 
@@ -481,8 +468,8 @@ body {
     flex-shrink: 0;
     position: fixed;
     right: 0;
-    top: 140px;
-    height: calc(100vh - 140px);
+    top: 64px;
+    height: calc(100vh - 64px);
     overflow-y: auto;
 }
 

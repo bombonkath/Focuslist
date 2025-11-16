@@ -132,6 +132,16 @@ function setupEventListeners() {
             
             const categoryName = this.querySelector('span').textContent;
             filterByCategory(categoryName);
+            
+            // Cerrar menú hamburguesa en móvil
+            const sidebarLeft = document.querySelector('.sidebar-left');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebarLeft && window.innerWidth <= 768) {
+                sidebarLeft.classList.remove('mobile-visible');
+                if (overlay) {
+                    overlay.classList.remove('visible');
+                }
+            }
         });
     });
 

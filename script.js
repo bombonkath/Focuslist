@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
+    initializeTheme();
     setupEventListeners();
     renderTasks();
     updateTaskCounts();
@@ -641,3 +642,32 @@ function setupMobileMenu() {
 
 // Inicializar efectos después del renderizado
 setTimeout(addHoverEffects, 100);
+
+// Funcionalidad de Tema Oscuro
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+}
+
+function setTheme(theme) {
+    const body = document.body;
+    
+    if (theme === 'dark') {
+        body.classList.add('dark-theme');
+    } else {
+        body.classList.remove('dark-theme');
+    }
+    
+    localStorage.setItem('theme', theme);
+}
+
+function toggleTheme() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    return newTheme;
+}
+
+// Función global para cambiar tema desde otras páginas
+window.setTheme = setTheme;
+window.toggleTheme = toggleTheme;

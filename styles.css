@@ -1120,3 +1120,236 @@ body {
         font-size: 0.7rem;
     }
 }
+
+/* Tema Oscuro */
+body.dark-theme {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-theme .header {
+    background-color: #2d2d2d;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+body.dark-theme .app-title {
+    color: #e0e0e0;
+}
+
+body.dark-theme .search-bar input {
+    background-color: #3d3d3d;
+    border-color: #4d4d4d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .search-bar input:focus {
+    border-color: #DDA0DD;
+}
+
+body.dark-theme .search-bar i {
+    color: #999;
+}
+
+body.dark-theme .notification-icon,
+body.dark-theme .user-profile,
+body.dark-theme .logout-btn {
+    color: #999;
+}
+
+body.dark-theme .notification-icon:hover,
+body.dark-theme .user-profile:hover {
+    background-color: #3d3d3d;
+    color: #DDA0DD;
+}
+
+body.dark-theme .logout-btn:hover {
+    background-color: #3d3d3d;
+    color: #ff4757;
+}
+
+body.dark-theme .sidebar-left {
+    background-color: #252525;
+}
+
+body.dark-theme .sidebar-section h3 {
+    color: #e0e0e0;
+}
+
+body.dark-theme .list-item {
+    color: #e0e0e0;
+}
+
+body.dark-theme .list-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .list-item.active {
+    background-color: #DDA0DD;
+    color: white;
+}
+
+body.dark-theme .category-item {
+    color: #e0e0e0;
+}
+
+body.dark-theme .category-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .main-content {
+    background-color: #1a1a1a;
+}
+
+body.dark-theme .title-section h1 {
+    color: #e0e0e0;
+}
+
+body.dark-theme .title-section p {
+    color: #999;
+}
+
+body.dark-theme .action-btn {
+    background-color: #2d2d2d;
+    border-color: #4d4d4d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .action-btn:hover {
+    border-color: #DDA0DD;
+    color: #DDA0DD;
+}
+
+body.dark-theme .task-input,
+body.dark-theme .date-input,
+body.dark-theme .category-select {
+    background-color: #2d2d2d;
+    border-color: #4d4d4d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .task-input:focus,
+body.dark-theme .date-input:focus,
+body.dark-theme .category-select:focus {
+    border-color: #DDA0DD;
+}
+
+body.dark-theme .task-item {
+    background-color: #2d2d2d;
+    border-color: #4d4d4d;
+}
+
+body.dark-theme .task-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+body.dark-theme .task-text {
+    color: #e0e0e0;
+}
+
+body.dark-theme .task-actions i {
+    color: #999;
+}
+
+body.dark-theme .task-actions i:hover {
+    background-color: #3d3d3d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .no-tasks-message {
+    background-color: #2d2d2d;
+    border-color: #4d4d4d;
+    color: #999;
+}
+
+body.dark-theme .sidebar-right {
+    background-color: #252525;
+}
+
+body.dark-theme .sidebar-card {
+    background-color: #2d2d2d;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+body.dark-theme .sidebar-card h3 {
+    color: #e0e0e0;
+}
+
+body.dark-theme .sidebar-card p {
+    color: #999;
+}
+
+body.dark-theme .progress-circle::before {
+    background: #1a1a1a;
+}
+
+body.dark-theme .progress-percentage {
+    color: #DDA0DD;
+}
+
+body.dark-theme .progress-label {
+    color: #999;
+}
+
+body.dark-theme .stat-number {
+    color: #e0e0e0;
+}
+
+body.dark-theme .stat-label {
+    color: #999;
+}
+
+body.dark-theme .urgent-item {
+    background-color: #3d2d2d;
+    border-left-color: #FF6B6B;
+}
+
+body.dark-theme .urgent-item:hover {
+    background-color: #4d3d3d;
+}
+
+body.dark-theme .urgent-item.soon {
+    background-color: #3d3d2d;
+    border-left-color: #FFD93D;
+}
+
+body.dark-theme .urgent-item.soon:hover {
+    background-color: #4d4d3d;
+}
+
+body.dark-theme .urgent-text {
+    color: #e0e0e0;
+}
+
+body.dark-theme .no-urgent {
+    color: #999;
+}
+
+body.dark-theme .quick-add input {
+    background-color: #3d3d3d;
+    border-color: #4d4d4d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .quick-add input:focus {
+    border-color: #DDA0DD;
+}
+
+body.dark-theme .quick-add-btn {
+    background-color: #3d3d3d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .quick-add-btn:hover {
+    background-color: #4d4d4d;
+}
+
+body.dark-theme .mobile-menu-btn,
+body.dark-theme .mobile-sidebar-btn {
+    color: #999;
+}
+
+body.dark-theme .mobile-menu-btn:hover,
+body.dark-theme .mobile-sidebar-btn:hover {
+    background-color: #3d3d3d;
+    color: #e0e0e0;
+}

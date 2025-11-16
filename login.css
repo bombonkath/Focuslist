@@ -337,3 +337,86 @@ body {
         font-size: 0.9rem;
     }
 }
+
+/* Tema Oscuro */
+body.dark-theme {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-theme .login-header {
+    background-color: #2d2d2d;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+body.dark-theme .app-title {
+    color: #e0e0e0;
+}
+
+body.dark-theme .help-btn {
+    color: #999;
+}
+
+body.dark-theme .help-btn:hover {
+    background-color: #3d3d3d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .login-card {
+    background-color: #2d2d2d;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+body.dark-theme .login-title {
+    color: #e0e0e0;
+}
+
+body.dark-theme .login-subtitle {
+    color: #999;
+}
+
+body.dark-theme .form-group label {
+    color: #e0e0e0;
+}
+
+body.dark-theme .form-group input {
+    background-color: #3d3d3d;
+    border-color: #4d4d4d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .form-group input:focus {
+    border-color: #DDA0DD;
+}
+
+body.dark-theme .form-group input::placeholder {
+    color: #666;
+}
+
+body.dark-theme .remember-me {
+    color: #999;
+}
+
+body.dark-theme .separator {
+    color: #666;
+}
+
+body.dark-theme .separator::before,
+body.dark-theme .separator::after {
+    border-bottom-color: #4d4d4d;
+}
+
+body.dark-theme .social-btn {
+    background-color: #3d3d3d;
+    border-color: #4d4d4d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .social-btn:hover {
+    background-color: #4d4d4d;
+    border-color: #5d5d5d;
+}
+
+body.dark-theme .signup-link {
+    color: #999;
+}

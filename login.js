@@ -1,5 +1,6 @@
 // Funcionalidad del Login
 document.addEventListener('DOMContentLoaded', function() {
+    initializeTheme();
     const loginForm = document.getElementById('loginForm');
     const createAccountLink = document.getElementById('createAccountLink');
     const socialButtons = document.querySelectorAll('.social-btn');
@@ -29,6 +30,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Funcionalidad de Tema Oscuro
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+}
+
+function setTheme(theme) {
+    const body = document.body;
+    
+    if (theme === 'dark') {
+        body.classList.add('dark-theme');
+    } else {
+        body.classList.remove('dark-theme');
+    }
+    
+    localStorage.setItem('theme', theme);
+}
 
 function handleLogin() {
     const email = document.getElementById('email').value;

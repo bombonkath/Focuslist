@@ -4,10 +4,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeProfile() {
+    initializeTheme();
     setupNavigation();
     setupSaveButton();
     setupQuickActions();
     setupDeleteAccount();
+    setupThemeSelector();
     loadUserData();
     updateStatistics();
 }
@@ -272,6 +274,58 @@ function showNotification(message) {
             }
         }, 300);
     }, 3000);
+}
+
+// Funcionalidad de Tema Oscuro
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    updateThemeSelector(savedTheme);
+}
+
+function setTheme(theme) {
+    const body = document.body;
+    
+    if (theme === 'dark') {
+        body.classList.add('dark-theme');
+    } else {
+        body.classList.remove('dark-theme');
+    }
+    
+    localStorage.setItem('theme', theme);
+    updateThemeSelector(theme);
+}
+
+function toggleTheme() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    return newTheme;
+}
+
+function updateThemeSelector(theme) {
+    const themeBadge = document.querySelector('#apariencia .setting-item:first-child .badge');
+    if (themeBadge) {
+        const icon = themeBadge.querySelector('i');
+        const text = theme === 'dark' ? 'Oscuro' : 'Claro';
+        const iconClass = theme === 'dark' ? 'fa-moon' : 'fa-sun';
+        
+        if (icon) {
+            icon.className = `fas ${iconClass}`;
+        }
+        themeBadge.innerHTML = `<i class="fas ${iconClass}"></i> ${text}`;
+    }
+}
+
+function setupThemeSelector() {
+    const themeSetting = document.querySelector('#apariencia .setting-item:first-child');
+    if (themeSetting) {
+        themeSetting.style.cursor = 'pointer';
+        themeSetting.addEventListener('click', function() {
+            const newTheme = toggleTheme();
+            showNotification(`Tema cambiado a ${newTheme === 'dark' ? 'oscuro' : 'claro'}`);
+        });
+    }
 }
 
 // Verificar sesión

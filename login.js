@@ -1,6 +1,7 @@
 // Funcionalidad del Login
 document.addEventListener('DOMContentLoaded', function() {
     initializeTheme();
+    initializeAccentColor();
     const loginForm = document.getElementById('loginForm');
     const createAccountLink = document.getElementById('createAccountLink');
     const socialButtons = document.querySelectorAll('.social-btn');
@@ -47,6 +48,51 @@ function setTheme(theme) {
     }
     
     localStorage.setItem('theme', theme);
+}
+
+// Funcionalidad de Color de Acento
+function initializeAccentColor() {
+    const savedColor = localStorage.getItem('accentColor') || '#DDA0DD';
+    const savedColorHover = localStorage.getItem('accentColorHover') || '#C8A2C8';
+    applyAccentColor(savedColor, savedColorHover);
+}
+
+function applyAccentColor(color, colorHover) {
+    // Actualizar variables CSS
+    document.documentElement.style.setProperty('--accent-color', color);
+    document.documentElement.style.setProperty('--accent-color-hover', colorHover);
+    
+    // Aplicar a elementos que usan el color directamente
+    const style = document.createElement('style');
+    style.id = 'accent-color-override';
+    
+    // Remover estilo anterior si existe
+    const existingStyle = document.getElementById('accent-color-override');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+    
+    style.textContent = `
+        .login-btn,
+        .remember-me input[type="checkbox"] {
+            background-color: ${color} !important;
+            color: white !important;
+            accent-color: ${color} !important;
+        }
+        .login-btn:hover {
+            background-color: ${colorHover} !important;
+            color: white !important;
+        }
+        .forgot-password {
+            color: ${color} !important;
+        }
+        .form-group input:focus {
+            border-color: ${color} !important;
+            box-shadow: 0 0 0 3px ${color}33 !important;
+        }
+    `;
+    
+    document.head.appendChild(style);
 }
 
 function handleLogin() {

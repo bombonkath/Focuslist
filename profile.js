@@ -5,11 +5,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initializeProfile() {
     initializeTheme();
+    initializeAccentColor();
     setupNavigation();
     setupSaveButton();
     setupQuickActions();
     setupDeleteAccount();
     setupThemeSelector();
+    setupAccentColorSelector();
     loadUserData();
     updateStatistics();
 }
@@ -325,6 +327,202 @@ function setupThemeSelector() {
             const newTheme = toggleTheme();
             showNotification(`Tema cambiado a ${newTheme === 'dark' ? 'oscuro' : 'claro'}`);
         });
+    }
+}
+
+// Funcionalidad de Color de Acento
+function initializeAccentColor() {
+    const savedColor = localStorage.getItem('accentColor') || '#DDA0DD';
+    const savedColorName = localStorage.getItem('accentColorName') || 'Pastel';
+    const savedColorHover = localStorage.getItem('accentColorHover') || '#C8A2C8';
+    
+    applyAccentColor(savedColor, savedColorHover);
+    updateAccentColorBadge(savedColorName);
+}
+
+function setupAccentColorSelector() {
+    const accentColorSetting = document.getElementById('accentColorSetting');
+    const colorPickerDropdown = document.getElementById('colorPickerDropdown');
+    const colorOptions = document.querySelectorAll('.color-option');
+    
+    if (!accentColorSetting || !colorPickerDropdown) return;
+    
+    // Función para posicionar el dropdown
+    function positionDropdown() {
+        const rect = accentColorSetting.getBoundingClientRect();
+        const settingValue = accentColorSetting.querySelector('.setting-value');
+        const valueRect = settingValue ? settingValue.getBoundingClientRect() : rect;
+        
+        const dropdownWidth = 200;
+        const dropdownHeight = colorPickerDropdown.scrollHeight || 300;
+        
+        // Calcular posición: alineado con el badge (setting-value)
+        let top = valueRect.bottom + 8;
+        let left = valueRect.right - dropdownWidth;
+        
+        // Ajustar si se sale por la derecha
+        if (left < 20) {
+            left = valueRect.left;
+        }
+        
+        // Ajustar si se sale por abajo
+        if (top + dropdownHeight > window.innerHeight - 20) {
+            top = valueRect.top - dropdownHeight - 8;
+            // Si tampoco cabe arriba, ponerlo arriba del viewport
+            if (top < 20) {
+                top = 20;
+            }
+        }
+        
+        colorPickerDropdown.style.top = `${top}px`;
+        colorPickerDropdown.style.left = `${left}px`;
+    }
+    
+    // Toggle dropdown al hacer click en el setting
+    accentColorSetting.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        const isShowing = colorPickerDropdown.classList.contains('show');
+        
+        if (!isShowing) {
+            // Calcular posición antes de mostrar
+            positionDropdown();
+        }
+        
+        colorPickerDropdown.classList.toggle('show');
+    });
+    
+    // Cerrar dropdown al hacer click fuera
+    document.addEventListener('click', function(e) {
+        if (!accentColorSetting.contains(e.target) && !colorPickerDropdown.contains(e.target)) {
+            colorPickerDropdown.classList.remove('show');
+        }
+    });
+    
+    // Reposicionar al hacer scroll o resize
+    window.addEventListener('scroll', function() {
+        if (colorPickerDropdown.classList.contains('show')) {
+            positionDropdown();
+        }
+    });
+    
+    window.addEventListener('resize', function() {
+        if (colorPickerDropdown.classList.contains('show')) {
+            positionDropdown();
+        }
+    });
+    
+    // Seleccionar color
+    colorOptions.forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const color = this.getAttribute('data-color');
+            const colorName = this.getAttribute('data-name');
+            const colorHover = this.getAttribute('data-hover');
+            
+            applyAccentColor(color, colorHover);
+            updateAccentColorBadge(colorName);
+            
+            // Guardar preferencia
+            localStorage.setItem('accentColor', color);
+            localStorage.setItem('accentColorName', colorName);
+            localStorage.setItem('accentColorHover', colorHover);
+            
+            // Cerrar dropdown
+            colorPickerDropdown.classList.remove('show');
+            
+            showNotification(`Color de acento cambiado a ${colorName}`);
+        });
+    });
+}
+
+function applyAccentColor(color, colorHover) {
+    // Actualizar variables CSS
+    document.documentElement.style.setProperty('--accent-color', color);
+    document.documentElement.style.setProperty('--accent-color-hover', colorHover);
+    
+    // Aplicar a elementos que usan el color directamente (para compatibilidad)
+    const style = document.createElement('style');
+    style.id = 'accent-color-override';
+    
+    // Remover estilo anterior si existe
+    const existingStyle = document.getElementById('accent-color-override');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+    
+    style.textContent = `
+        .mobile-sidebar-btn,
+        .list-item.active,
+        .add-btn,
+        .save-btn,
+        .login-btn,
+        .action-btn:hover,
+        .task-input:focus,
+        .date-input:focus,
+        .category-select:focus,
+        .search-bar input:focus,
+        .notification-icon:hover,
+        .user-profile:hover,
+        .badge.active,
+        .forgot-password,
+        .action-link,
+        .change-photo-btn:hover,
+        .nav-btn:hover,
+        .progress-percentage {
+            color: ${color} !important;
+            border-color: ${color} !important;
+        }
+        .list-item.active,
+        .add-btn,
+        .save-btn,
+        .login-btn,
+        .nav-item.active,
+        .badge.active {
+            background-color: ${color} !important;
+        }
+        .add-btn,
+        .save-btn,
+        .login-btn {
+            color: white !important;
+        }
+        .nav-item.active {
+            color: white !important;
+        }
+        .nav-item.active i {
+            color: white !important;
+        }
+        .nav-item.active span {
+            color: white !important;
+        }
+        .add-btn:hover,
+        .save-btn:hover,
+        .login-btn:hover {
+            background-color: ${colorHover} !important;
+            color: white !important;
+        }
+        .action-btn:hover,
+        .task-input:focus,
+        .date-input:focus,
+        .category-select:focus,
+        .search-bar input:focus {
+            border-color: ${color} !important;
+        }
+        .progress-circle {
+            background: conic-gradient(${color} var(--progress-degrees, 0deg), #e0e0e0 var(--progress-degrees, 0deg)) !important;
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
+
+function updateAccentColorBadge(colorName) {
+    const badge = document.getElementById('accentColorBadge');
+    const nameSpan = document.getElementById('accentColorName');
+    
+    if (nameSpan) {
+        nameSpan.textContent = colorName;
     }
 }
 

@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initializeApp() {
     initializeTheme();
+    initializeAccentColor();
     setupEventListeners();
     renderTasks();
     updateTaskCounts();
@@ -211,7 +212,8 @@ function updateDailyProgress() {
     const progressCircle = document.getElementById('progressCircle');
     if (progressCircle) {
         const degrees = (percentage / 100) * 360;
-        progressCircle.style.background = `conic-gradient(#DDA0DD ${degrees}deg, #e0e0e0 ${degrees}deg)`;
+        const accentColor = localStorage.getItem('accentColor') || '#DDA0DD';
+        progressCircle.style.background = `conic-gradient(${accentColor} ${degrees}deg, #e0e0e0 ${degrees}deg)`;
     }
     
     // Actualizar estadísticas
@@ -681,3 +683,72 @@ function toggleTheme() {
 // Función global para cambiar tema desde otras páginas
 window.setTheme = setTheme;
 window.toggleTheme = toggleTheme;
+
+// Funcionalidad de Color de Acento
+function initializeAccentColor() {
+    const savedColor = localStorage.getItem('accentColor') || '#DDA0DD';
+    const savedColorHover = localStorage.getItem('accentColorHover') || '#C8A2C8';
+    applyAccentColor(savedColor, savedColorHover);
+}
+
+function applyAccentColor(color, colorHover) {
+    // Actualizar variables CSS
+    document.documentElement.style.setProperty('--accent-color', color);
+    document.documentElement.style.setProperty('--accent-color-hover', colorHover);
+    
+    // Aplicar a elementos que usan el color directamente
+    const style = document.createElement('style');
+    style.id = 'accent-color-override';
+    
+    // Remover estilo anterior si existe
+    const existingStyle = document.getElementById('accent-color-override');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+    
+    style.textContent = `
+        .mobile-sidebar-btn,
+        .add-btn,
+        .action-btn:hover,
+        .task-input:focus,
+        .date-input:focus,
+        .category-select:focus,
+        .search-bar input:focus,
+        .notification-icon:hover,
+        .user-profile:hover {
+            color: ${color} !important;
+            border-color: ${color} !important;
+        }
+        .list-item.active,
+        .add-btn {
+            background-color: ${color} !important;
+        }
+        .add-btn {
+            color: white !important;
+        }
+        .list-item.active {
+            color: white !important;
+        }
+        .list-item.active i {
+            color: white !important;
+        }
+        .list-item.active span {
+            color: white !important;
+        }
+        .add-btn:hover {
+            background-color: ${colorHover} !important;
+        }
+        .action-btn:hover,
+        .task-input:focus,
+        .date-input:focus,
+        .category-select:focus,
+        .search-bar input:focus {
+            border-color: ${color} !important;
+        }
+        .progress-circle {
+            background: conic-gradient(${color} var(--progress-degrees, 0deg), #e0e0e0 var(--progress-degrees, 0deg)) !important;
+        }
+    `;
+    
+    document.head.appendChild(style);
+}

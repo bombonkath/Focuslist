@@ -3,10 +3,12 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTheme();
     initializeAccentColor();
     const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
     const createAccountLink = document.getElementById('createAccountLink');
+    const backToLoginLink = document.getElementById('backToLoginLink');
     const socialButtons = document.querySelectorAll('.social-btn');
 
-    // Manejar envío del formulario
+    // Manejar envío del formulario de login
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -14,12 +16,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Link para crear cuenta
+    // Manejar envío del formulario de registro
+    if (signupForm) {
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleSignup();
+        });
+    }
+
+    // Toggle entre login y registro
     if (createAccountLink) {
         createAccountLink.addEventListener('click', function(e) {
             e.preventDefault();
-            // Por ahora solo muestra un mensaje, puedes implementar registro después
-            alert('Funcionalidad de registro próximamente');
+            showSignupForm();
+        });
+    }
+
+    if (backToLoginLink) {
+        backToLoginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoginForm();
         });
     }
 
@@ -31,6 +47,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Funciones para toggle entre formularios
+function showLoginForm() {
+    const loginContainer = document.getElementById('loginFormContainer');
+    const signupContainer = document.getElementById('signupFormContainer');
+    if (loginContainer && signupContainer) {
+        loginContainer.style.display = 'block';
+        signupContainer.style.display = 'none';
+    }
+}
+
+function showSignupForm() {
+    const loginContainer = document.getElementById('loginFormContainer');
+    const signupContainer = document.getElementById('signupFormContainer');
+    if (loginContainer && signupContainer) {
+        loginContainer.style.display = 'none';
+        signupContainer.style.display = 'block';
+    }
+}
 
 // Funcionalidad de Tema Oscuro
 function initializeTheme() {
@@ -106,10 +141,27 @@ function handleLogin() {
         return;
     }
 
-    // Simulación de login (en producción esto sería una llamada a API)
-    // Por ahora, guardamos en localStorage y redirigimos
+    // Verificar si el usuario existe
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.email === email);
+
+    if (!user) {
+        showError('El correo electrónico no está registrado');
+        return;
+    }
+
+    // Verificar contraseña (en producción esto sería con hash)
+    if (user.password !== password) {
+        showError('Contraseña incorrecta');
+        return;
+    }
+
+    // Login exitoso
     const userData = {
-        email: email,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        fullName: `${user.firstName} ${user.lastName}`,
         rememberMe: rememberMe,
         loginTime: new Date().toISOString()
     };
@@ -123,6 +175,87 @@ function handleLogin() {
 
     // Redirigir a la aplicación principal
     window.location.href = 'index.html';
+}
+
+function handleSignup() {
+    const firstName = document.getElementById('signupFirstName').value.trim();
+    const lastName = document.getElementById('signupLastName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirmPassword = document.getElementById('signupConfirmPassword').value;
+    const rememberMe = document.getElementById('signupRememberMe').checked;
+
+    // Validación básica
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+        showError('Por favor, completa todos los campos');
+        return;
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showError('Por favor, ingresa un correo electrónico válido');
+        return;
+    }
+
+    // Validar longitud de contraseña
+    if (password.length < 6) {
+        showError('La contraseña debe tener al menos 6 caracteres');
+        return;
+    }
+
+    // Validar que las contraseñas coincidan
+    if (password !== confirmPassword) {
+        showError('Las contraseñas no coinciden');
+        return;
+    }
+
+    // Verificar si el usuario ya existe
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const existingUser = users.find(u => u.email === email);
+
+    if (existingUser) {
+        showError('Este correo electrónico ya está registrado');
+        return;
+    }
+
+    // Crear nuevo usuario
+    const newUser = {
+        id: Date.now(),
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password, // En producción esto debería ser un hash
+        createdAt: new Date().toISOString()
+    };
+
+    // Guardar usuario
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Iniciar sesión automáticamente
+    const userData = {
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        fullName: `${newUser.firstName} ${newUser.lastName}`,
+        rememberMe: rememberMe,
+        loginTime: new Date().toISOString()
+    };
+
+    if (rememberMe) {
+        localStorage.setItem('userData', JSON.stringify(userData));
+    } else {
+        sessionStorage.setItem('userData', JSON.stringify(userData));
+    }
+
+    // Mostrar mensaje de éxito
+    showNotification('¡Cuenta creada exitosamente!');
+
+    // Redirigir a la aplicación principal
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1000);
 }
 
 function handleSocialLogin(provider) {

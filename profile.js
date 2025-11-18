@@ -132,23 +132,51 @@ function updateDisplay() {
 
 // Actualizar estadísticas
 function updateStatistics() {
-    // Obtener estadísticas de las tareas (si están disponibles)
-    // Por ahora usamos valores por defecto, pero podrías cargarlos desde localStorage
-    const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    // Obtener estadísticas de las tareas desde localStorage
+    try {
+        const userData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
+        const userId = userData.email || 'guest';
+        const savedTasks = localStorage.getItem(`tasks_${userId}`);
+        
+        let tasks = [];
+        if (savedTasks) {
+            tasks = JSON.parse(savedTasks);
+        }
+        
+        const completedTasks = tasks.filter(t => t.completed).length;
+        const pendingTasks = tasks.filter(t => !t.completed).length;
+        
+        // Actualizar valores
+        const completedEl = document.getElementById('completedTasks');
+        const pendingEl = document.getElementById('pendingTasks');
+        
+        if (completedEl) completedEl.textContent = completedTasks;
+        if (pendingEl) pendingEl.textContent = pendingTasks;
+        
+        // Calcular racha (simplificado - días consecutivos con al menos una tarea completada)
+        const streakEl = document.getElementById('streakDays');
+        if (streakEl) {
+            // Por ahora fijo, pero se puede calcular basándose en las fechas de completado
+            streakEl.textContent = calculateStreak(tasks);
+        }
+    } catch (error) {
+        console.error('Error cargando estadísticas:', error);
+        // Valores por defecto si hay error
+        const completedEl = document.getElementById('completedTasks');
+        const pendingEl = document.getElementById('pendingTasks');
+        if (completedEl) completedEl.textContent = 0;
+        if (pendingEl) pendingEl.textContent = 0;
+    }
+}
+
+function calculateStreak(tasks) {
+    // Calcular racha de días consecutivos con tareas completadas
+    const completedTasks = tasks.filter(t => t.completed);
+    if (completedTasks.length === 0) return 0;
     
-    const completedTasks = tasks.filter(t => t.completed).length;
-    const pendingTasks = tasks.filter(t => !t.completed).length;
-    
-    // Actualizar valores
-    const completedEl = document.getElementById('completedTasks');
-    const pendingEl = document.getElementById('pendingTasks');
-    
-    if (completedEl) completedEl.textContent = completedTasks || 128;
-    if (pendingEl) pendingEl.textContent = pendingTasks || 7;
-    
-    // Calcular racha (simplificado)
-    const streakEl = document.getElementById('streakDays');
-    if (streakEl) streakEl.textContent = 12; // Por ahora fijo
+    // Por ahora retornamos un valor simple basado en tareas completadas
+    // En el futuro se puede mejorar calculando días consecutivos reales
+    return Math.min(completedTasks.length, 30); // Máximo 30 días
 }
 
 // Acciones rápidas

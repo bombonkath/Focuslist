@@ -1,5 +1,8 @@
 // Variables globales
-let tasks = [
+let tasks = [];
+
+// Datos de ejemplo para primera vez
+const defaultTasks = [
     {
         id: 1,
         text: "Pagar la factura de electricidad",
@@ -57,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
+    loadTasks(); // Cargar tareas guardadas
     initializeTheme();
     initializeAccentColor();
     setupEventListeners();
@@ -160,6 +164,47 @@ function setupEventListeners() {
     });
 }
 
+// Funciones de persistencia de datos
+function saveTasks() {
+    try {
+        const userData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
+        const userId = userData.email || 'guest';
+        localStorage.setItem(`tasks_${userId}`, JSON.stringify(tasks));
+    } catch (error) {
+        console.error('Error guardando tareas:', error);
+    }
+}
+
+function loadTasks() {
+    try {
+        const userData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
+        const userId = userData.email || 'guest';
+        const savedTasks = localStorage.getItem(`tasks_${userId}`);
+        
+        if (savedTasks) {
+            tasks = JSON.parse(savedTasks);
+            // Asegurar que las tareas tengan todas las propiedades necesarias
+            tasks = tasks.map(task => ({
+                id: task.id || Date.now() + Math.random(),
+                text: task.text || '',
+                completed: task.completed || false,
+                tags: task.tags || [],
+                category: task.category || 'Personal',
+                dueDate: task.dueDate || new Date().toISOString().split('T')[0],
+                priority: task.priority || 'medium'
+            }));
+        } else {
+            // Si no hay tareas guardadas, usar las de ejemplo solo la primera vez
+            tasks = JSON.parse(JSON.stringify(defaultTasks));
+            saveTasks(); // Guardar las tareas de ejemplo
+        }
+    } catch (error) {
+        console.error('Error cargando tareas:', error);
+        // Si hay error, usar tareas de ejemplo
+        tasks = JSON.parse(JSON.stringify(defaultTasks));
+    }
+}
+
 // Funciones de tareas
 function addNewTask() {
     const taskInput = document.querySelector('.task-input');
@@ -181,6 +226,7 @@ function addNewTask() {
         };
         
         tasks.push(newTask);
+        saveTasks(); // Guardar después de agregar
         taskInput.value = '';
         dateInput.value = ''; // Limpiar el selector de fecha pero mantener la categoría
         renderTasks();
@@ -280,6 +326,7 @@ function toggleTaskComplete(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (task) {
         task.completed = !task.completed;
+        saveTasks(); // Guardar después de cambiar estado
         renderTasks();
         updateTaskCounts();
         updateDailyProgress();
@@ -290,6 +337,7 @@ function toggleTaskComplete(taskId) {
 function deleteTask(taskId) {
     if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
         tasks = tasks.filter(t => t.id !== taskId);
+        saveTasks(); // Guardar después de eliminar
         renderTasks();
         updateTaskCounts();
         updateDailyProgress();
@@ -304,6 +352,7 @@ function editTask(taskId) {
         const newText = prompt('Editar tarea:', task.text);
         if (newText && newText.trim()) {
             task.text = newText.trim();
+            saveTasks(); // Guardar después de editar
             renderTasks();
             updateUrgentTasks();
             showNotification('Tarea actualizada');

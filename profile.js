@@ -487,6 +487,12 @@ function applyAccentColor(color, colorHover) {
         .login-btn {
             color: white !important;
         }
+        .badge.active {
+            color: white !important;
+        }
+        .badge.active i {
+            color: white !important;
+        }
         .nav-item.active {
             color: white !important;
         }

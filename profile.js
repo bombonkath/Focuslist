@@ -12,7 +12,9 @@ function initializeProfile() {
     setupDeleteAccount();
     setupThemeSelector();
     setupAccentColorSelector();
+    setupChangePassword(); // Nueva función para manejar cambio de contraseña
     loadUserData();
+    loadProfilePhoto(); // Cargar foto de perfil guardada
     updateStatistics();
 }
 
@@ -52,14 +54,113 @@ function setupSaveButton() {
 
 // Guardar cambios del perfil
 function saveProfileChanges() {
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const email = document.getElementById('email').value;
-    const username = document.getElementById('username').value;
+    // Obtener los valores de los campos del formulario
+    const firstName = document.getElementById('firstName').value.trim(); // trim() elimina espacios al inicio y final
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim();
     const language = document.getElementById('language').value;
     const timezone = document.getElementById('timezone').value;
 
-    // Actualizar datos del usuario
+    // VALIDACIÓN 1: Verificar que el nombre no esté vacío
+    if (!firstName || firstName.length === 0) {
+        showError('El nombre es obligatorio');
+        document.getElementById('firstName').focus(); // Enfocar el campo con error
+        return; // Salir de la función
+    }
+
+    // VALIDACIÓN 2: Verificar que el apellido no esté vacío
+    if (!lastName || lastName.length === 0) {
+        showError('El apellido es obligatorio');
+        document.getElementById('lastName').focus();
+        return;
+    }
+
+    // VALIDACIÓN 3: Verificar que el nombre tenga al menos 2 caracteres
+    if (firstName.length < 2) {
+        showError('El nombre debe tener al menos 2 caracteres');
+        document.getElementById('firstName').focus();
+        return;
+    }
+
+    // VALIDACIÓN 4: Verificar que el apellido tenga al menos 2 caracteres
+    if (lastName.length < 2) {
+        showError('El apellido debe tener al menos 2 caracteres');
+        document.getElementById('lastName').focus();
+        return;
+    }
+
+    // VALIDACIÓN 5: Verificar que el email no esté vacío
+    if (!email || email.length === 0) {
+        showError('El correo electrónico es obligatorio');
+        document.getElementById('email').focus();
+        return;
+    }
+
+    // VALIDACIÓN 6: Verificar formato de email válido
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    if (!emailRegex.test(email)) {
+        showError('Por favor, ingresa un correo electrónico válido');
+        document.getElementById('email').focus();
+        return;
+    }
+
+    // VALIDACIÓN 7: Verificar que el username no esté vacío
+    if (!username || username.length === 0) {
+        showError('El nombre de usuario es obligatorio');
+        document.getElementById('username').focus();
+        return;
+    }
+
+    // VALIDACIÓN 8: Verificar que el username tenga al menos 3 caracteres
+    if (username.length < 3) {
+        showError('El nombre de usuario debe tener al menos 3 caracteres');
+        document.getElementById('username').focus();
+        return;
+    }
+
+    // VALIDACIÓN 9: Verificar que el username solo contenga letras, números, guiones y guiones bajos
+    const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+    if (!usernameRegex.test(username)) {
+        showError('El nombre de usuario solo puede contener letras, números, guiones y guiones bajos');
+        document.getElementById('username').focus();
+        return;
+    }
+
+    // VALIDACIÓN 10: Verificar que el username no empiece con guión o guión bajo
+    if (username.startsWith('-') || username.startsWith('_')) {
+        showError('El nombre de usuario no puede empezar con guión o guión bajo');
+        document.getElementById('username').focus();
+        return;
+    }
+
+    // Obtener datos del usuario actual
+    const existingData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
+    const currentEmail = existingData.email;
+
+    // VALIDACIÓN 11: Si el email cambió, verificar que no esté en uso por otro usuario
+    if (email !== currentEmail) {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const emailExists = users.some(u => u.email === email && u.email !== currentEmail);
+        
+        if (emailExists) {
+            showError('Este correo electrónico ya está en uso por otra cuenta');
+            document.getElementById('email').focus();
+            return;
+        }
+    }
+
+    // VALIDACIÓN 12: Verificar que el username no esté en uso por otro usuario (si cambió)
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const usernameExists = users.some(u => u.username === username && u.email !== currentEmail);
+    
+    if (usernameExists) {
+        showError('Este nombre de usuario ya está en uso');
+        document.getElementById('username').focus();
+        return;
+    }
+
+    // Si todas las validaciones pasan, crear el objeto con los datos actualizados
     const userData = {
         firstName: firstName,
         lastName: lastName,
@@ -70,8 +171,7 @@ function saveProfileChanges() {
         fullName: `${firstName} ${lastName}`
     };
 
-    // Guardar en localStorage
-    const existingData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
+    // Actualizar datos en localStorage/sessionStorage
     const updatedData = { ...existingData, ...userData };
     
     if (existingData.rememberMe) {
@@ -80,9 +180,31 @@ function saveProfileChanges() {
         sessionStorage.setItem('userData', JSON.stringify(updatedData));
     }
 
-    // Actualizar display
+    // Si el email cambió, actualizar también en el array de usuarios
+    if (email !== currentEmail) {
+        const userIndex = users.findIndex(u => u.email === currentEmail);
+        if (userIndex !== -1) {
+            users[userIndex].email = email;
+            users[userIndex].firstName = firstName;
+            users[userIndex].lastName = lastName;
+            users[userIndex].username = username;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+    } else {
+        // Si el email no cambió, solo actualizar nombre y apellido en el array
+        const userIndex = users.findIndex(u => u.email === email);
+        if (userIndex !== -1) {
+            users[userIndex].firstName = firstName;
+            users[userIndex].lastName = lastName;
+            users[userIndex].username = username;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+    }
+
+    // Actualizar la visualización del perfil
     updateDisplay();
     
+    // Mostrar mensaje de éxito
     showNotification('Cambios guardados correctamente');
 }
 
@@ -122,12 +244,23 @@ function updateDisplay() {
     if (displayName) displayName.textContent = fullName;
     if (displayEmail) displayEmail.textContent = email;
 
-    // Actualizar avatar
+    // Actualizar avatar (solo si no hay foto personalizada guardada)
+    const userData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
+    const userEmail = userData.email || 'guest';
+    const savedPhoto = localStorage.getItem(`profilePhoto_${userEmail}`) || userData.profilePhoto;
+    
     const avatar = document.getElementById('profileAvatar');
     const picture = document.getElementById('profilePicture');
-    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=ff69b4&color=fff`;
-    if (avatar) avatar.src = avatarUrl;
-    if (picture) picture.src = avatarUrl + '&size=128';
+    
+    // Si hay foto guardada, usarla; si no, generar avatar automático
+    if (savedPhoto) {
+        if (avatar) avatar.src = savedPhoto;
+        if (picture) picture.src = savedPhoto;
+    } else {
+        const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=ff69b4&color=fff`;
+        if (avatar) avatar.src = avatarUrl;
+        if (picture) picture.src = avatarUrl + '&size=128';
+    }
 }
 
 // Actualizar estadísticas
@@ -248,26 +381,110 @@ if (settingsBtn) {
 const changePhotoBtn = document.querySelector('.change-photo-btn');
 if (changePhotoBtn) {
     changePhotoBtn.addEventListener('click', function() {
-        // Crear input de archivo
+        // Crear un elemento input de tipo file (para seleccionar archivos)
         const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
+        input.type = 'file'; // Tipo de input para archivos
+        input.accept = 'image/*'; // Solo aceptar imágenes (cualquier formato)
+        
+        // Cuando el usuario selecciona un archivo
         input.onchange = function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const avatar = document.getElementById('profileAvatar');
-                    const picture = document.getElementById('profilePicture');
-                    if (avatar) avatar.src = event.target.result;
-                    if (picture) picture.src = event.target.result;
-                    showNotification('Foto de perfil actualizada');
-                };
-                reader.readAsDataURL(file);
+            const file = e.target.files[0]; // Obtener el primer archivo seleccionado
+            
+            // VALIDACIÓN 1: Verificar que se seleccionó un archivo
+            if (!file) {
+                return; // Si no hay archivo, salir
             }
+            
+            // VALIDACIÓN 2: Verificar que el archivo sea una imagen
+            if (!file.type.startsWith('image/')) {
+                showError('Por favor, selecciona un archivo de imagen válido');
+                return; // Si no es imagen, mostrar error y salir
+            }
+            
+            // VALIDACIÓN 3: Verificar el tamaño del archivo (máximo 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+            if (file.size > maxSize) {
+                showError('La imagen es demasiado grande. Máximo 5MB');
+                return; // Si es muy grande, mostrar error y salir
+            }
+            
+            // Crear un FileReader para leer el archivo como base64
+            const reader = new FileReader();
+            
+            // Cuando el archivo se haya leído exitosamente
+            reader.onload = function(event) {
+                // event.target.result contiene la imagen en formato base64
+                const imageBase64 = event.target.result;
+                
+                // Obtener los elementos de imagen del DOM
+                const avatar = document.getElementById('profileAvatar');
+                const picture = document.getElementById('profilePicture');
+                
+                // Actualizar las imágenes con la nueva foto
+                if (avatar) avatar.src = imageBase64;
+                if (picture) picture.src = imageBase64;
+                
+                // Obtener datos del usuario actual
+                const userData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
+                const userEmail = userData.email || 'guest';
+                
+                // Guardar la foto en localStorage con una clave única por usuario
+                // Usamos base64 para poder guardarlo como string en localStorage
+                localStorage.setItem(`profilePhoto_${userEmail}`, imageBase64);
+                
+                // También guardar en el objeto userData para fácil acceso
+                const updatedData = { ...userData, profilePhoto: imageBase64 };
+                if (userData.rememberMe) {
+                    localStorage.setItem('userData', JSON.stringify(updatedData));
+                } else {
+                    sessionStorage.setItem('userData', JSON.stringify(updatedData));
+                }
+                
+                // Mostrar notificación de éxito
+                showNotification('Foto de perfil actualizada');
+            };
+            
+            // Si hay un error al leer el archivo
+            reader.onerror = function() {
+                showError('Error al cargar la imagen. Por favor, intenta de nuevo');
+            };
+            
+            // Leer el archivo como Data URL (base64)
+            reader.readAsDataURL(file);
         };
+        
+        // Simular click en el input para abrir el selector de archivos
         input.click();
     });
+}
+
+// Función para cargar la foto de perfil guardada al iniciar
+function loadProfilePhoto() {
+    // Obtener datos del usuario actual
+    const userData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
+    const userEmail = userData.email || 'guest';
+    
+    // Intentar cargar la foto desde localStorage
+    const savedPhoto = localStorage.getItem(`profilePhoto_${userEmail}`) || userData.profilePhoto;
+    
+    // Si hay una foto guardada, actualizar las imágenes
+    if (savedPhoto) {
+        const avatar = document.getElementById('profileAvatar');
+        const picture = document.getElementById('profilePicture');
+        
+        if (avatar) avatar.src = savedPhoto;
+        if (picture) picture.src = savedPhoto;
+    } else {
+        // Si no hay foto guardada, usar el avatar generado automáticamente
+        const fullName = userData.fullName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
+        if (fullName) {
+            const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=ff69b4&color=fff`;
+            const avatar = document.getElementById('profileAvatar');
+            const picture = document.getElementById('profilePicture');
+            if (avatar) avatar.src = avatarUrl;
+            if (picture) picture.src = avatarUrl + '&size=128';
+        }
+    }
 }
 
 // Notificaciones
@@ -301,6 +518,51 @@ function showNotification(message) {
         setTimeout(() => {
             if (document.body.contains(notification)) {
                 document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Función para mostrar errores (similar a showNotification pero con color rojo)
+function showError(message) {
+    // Crear un elemento div para el mensaje de error
+    const errorDiv = document.createElement('div');
+    
+    // Aplicar estilos CSS inline (mismo estilo que showNotification pero con fondo rojo)
+    errorDiv.style.cssText = `
+        position: fixed;              /* Posición fija en la pantalla */
+        top: 100px;                   /* 100px desde arriba */
+        right: 20px;                  /* 20px desde la derecha */
+        background-color: #ff4757;     /* Color rojo para errores */
+        color: white;                 /* Texto blanco */
+        padding: 1rem 1.5rem;         /* Espaciado interno */
+        border-radius: 8px;            /* Bordes redondeados */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Sombra para destacar */
+        z-index: 10000;               /* Por encima de otros elementos */
+        font-size: 0.9rem;            /* Tamaño de fuente */
+        font-weight: 500;             /* Grosor de fuente */
+        transform: translateX(100%);  /* Inicialmente fuera de la pantalla (derecha) */
+        transition: transform 0.3s ease; /* Animación suave */
+    `;
+    
+    // Establecer el texto del mensaje de error
+    errorDiv.textContent = message;
+    
+    // Agregar el elemento al body del documento
+    document.body.appendChild(errorDiv);
+    
+    // Después de 100ms, animar la entrada (deslizar desde la derecha)
+    setTimeout(() => {
+        errorDiv.style.transform = 'translateX(0)'; // Mover a posición visible
+    }, 100);
+    
+    // Después de 3 segundos, animar la salida
+    setTimeout(() => {
+        errorDiv.style.transform = 'translateX(100%)'; // Mover fuera de la pantalla
+        // Después de la animación (300ms), eliminar el elemento del DOM
+        setTimeout(() => {
+            if (document.body.contains(errorDiv)) {
+                document.body.removeChild(errorDiv);
             }
         }, 300);
     }, 3000);
@@ -558,6 +820,100 @@ function updateAccentColorBadge(colorName) {
     if (nameSpan) {
         nameSpan.textContent = colorName;
     }
+}
+
+// Función para cambiar contraseña
+function setupChangePassword() {
+    // Obtener el formulario de cambio de contraseña por su ID
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    
+    // Verificar que el formulario existe antes de agregar el listener
+    if (!changePasswordForm) {
+        return; // Si no existe, salir de la función
+    }
+    
+    // Agregar un listener para cuando se envíe el formulario
+    changePasswordForm.addEventListener('submit', function(e) {
+        // Prevenir el comportamiento por defecto (recargar la página)
+        e.preventDefault();
+        
+        // Llamar a la función que maneja el cambio de contraseña
+        handleChangePassword();
+    });
+}
+
+function handleChangePassword() {
+    // Obtener los valores de los campos del formulario
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    // Obtener los datos del usuario actual desde localStorage o sessionStorage
+    const userData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
+    const userEmail = userData.email;
+    
+    // Validación 1: Verificar que el usuario tenga email (esté logueado)
+    if (!userEmail) {
+        showError('No se pudo identificar al usuario. Por favor, inicia sesión nuevamente.');
+        return; // Salir de la función si no hay email
+    }
+    
+    // Validación 2: Verificar que todos los campos estén llenos
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showError('Por favor, completa todos los campos');
+        return; // Salir si falta algún campo
+    }
+    
+    // Validación 3: Verificar que la nueva contraseña tenga al menos 6 caracteres
+    if (newPassword.length < 6) {
+        showError('La nueva contraseña debe tener al menos 6 caracteres');
+        return; // Salir si la contraseña es muy corta
+    }
+    
+    // Validación 4: Verificar que ambas contraseñas nuevas coincidan
+    if (newPassword !== confirmPassword) {
+        showError('Las contraseñas nuevas no coinciden');
+        return; // Salir si no coinciden
+    }
+    
+    // Validación 5: Verificar que la nueva contraseña sea diferente a la actual
+    if (currentPassword === newPassword) {
+        showError('La nueva contraseña debe ser diferente a la actual');
+        return; // Salir si son iguales
+    }
+    
+    // Obtener el array de usuarios desde localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    // Buscar el usuario actual en el array por su email
+    const userIndex = users.findIndex(u => u.email === userEmail);
+    
+    // Validación 6: Verificar que el usuario existe en el array
+    if (userIndex === -1) {
+        showError('Usuario no encontrado');
+        return; // Salir si no se encuentra el usuario
+    }
+    
+    // Validación 7: Verificar que la contraseña actual sea correcta
+    // Comparar la contraseña ingresada con la guardada (en producción esto sería con hash)
+    if (users[userIndex].password !== currentPassword) {
+        showError('La contraseña actual es incorrecta');
+        return; // Salir si la contraseña no coincide
+    }
+    
+    // Si todas las validaciones pasan, actualizar la contraseña
+    users[userIndex].password = newPassword;
+    
+    // Guardar el array actualizado en localStorage
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    // Limpiar los campos del formulario
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+    
+    // Mostrar mensaje de éxito
+    showNotification('Contraseña cambiada exitosamente');
 }
 
 // Verificar sesión

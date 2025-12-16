@@ -71,6 +71,7 @@ function initializeApp() {
     updateDailyProgress();
     updateUrgentTasks();
     setupLogout();
+    setupStorageSync(); // Sincronización entre pestañas
 }
 
 function setupLogout() {
@@ -170,9 +171,25 @@ function saveTasks() {
         const userData = JSON.parse(localStorage.getItem('userData') || sessionStorage.getItem('userData') || '{}');
         const userId = userData.email || 'guest';
         localStorage.setItem(`tasks_${userId}`, JSON.stringify(tasks));
+        // Disparar evento personalizado para sincronización entre pestañas
+        localStorage.setItem(`tasks_${userId}_sync`, Date.now().toString());
     } catch (error) {
         console.error('Error guardando tareas:', error);
     }
+}
+
+// Sincronización entre pestañas
+function setupStorageSync() {
+    window.addEventListener('storage', function(e) {
+        if (e.key && e.key.startsWith('tasks_') && e.key.endsWith('_sync')) {
+            // Recargar tareas cuando hay cambios en otra pestaña
+            loadTasks();
+            renderTasks();
+            updateTaskCounts();
+            updateDailyProgress();
+            updateUrgentTasks();
+        }
+    });
 }
 
 function loadTasks() {

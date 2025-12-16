@@ -46,6 +46,15 @@ document.addEventListener('DOMContentLoaded', function() {
             handleSocialLogin(provider);
         });
     });
+
+    // Recuperación de contraseña
+    const forgotPasswordLink = document.querySelector('.forgot-password');
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            handleForgotPassword();
+        });
+    }
 });
 
 // Funciones para toggle entre formularios
@@ -191,10 +200,17 @@ function handleSignup() {
         return;
     }
 
-    // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Validar formato de email mejorado
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegex.test(email)) {
         showError('Por favor, ingresa un correo electrónico válido');
+        return;
+    }
+    
+    // Validar dominio del email
+    const emailParts = email.split('@');
+    if (emailParts.length !== 2 || !emailParts[1].includes('.')) {
+        showError('El correo electrónico debe tener un dominio válido');
         return;
     }
 
@@ -273,6 +289,49 @@ function handleSocialLogin(provider) {
         sessionStorage.setItem('userData', JSON.stringify(userData));
         window.location.href = 'index.html';
     }, 1000);
+}
+
+function handleForgotPassword() {
+    const email = document.getElementById('email').value;
+    
+    if (!email) {
+        const emailInput = prompt('Ingresa tu correo electrónico para recuperar tu contraseña:');
+        if (!emailInput) return;
+        
+        // Verificar si el usuario existe
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.email === emailInput);
+        
+        if (!user) {
+            showError('No existe una cuenta con ese correo electrónico');
+            return;
+        }
+        
+        // En producción, aquí se enviaría un email con un token de recuperación
+        // Por ahora, simulamos mostrando la contraseña (NO hacer esto en producción)
+        showNotification(`Se ha enviado un enlace de recuperación a ${emailInput}`);
+        
+        // Simulación: mostrar contraseña (solo para desarrollo)
+        if (confirm('¿Deseas ver tu contraseña? (Solo para desarrollo)')) {
+            alert(`Tu contraseña es: ${user.password}\n\n⚠️ En producción, esto se enviaría por email.`);
+        }
+    } else {
+        // Si ya hay un email en el campo
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.email === email);
+        
+        if (!user) {
+            showError('No existe una cuenta con ese correo electrónico');
+            return;
+        }
+        
+        showNotification(`Se ha enviado un enlace de recuperación a ${email}`);
+        
+        // Simulación: mostrar contraseña (solo para desarrollo)
+        if (confirm('¿Deseas ver tu contraseña? (Solo para desarrollo)')) {
+            alert(`Tu contraseña es: ${user.password}\n\n⚠️ En producción, esto se enviaría por email.`);
+        }
+    }
 }
 
 function showError(message) {

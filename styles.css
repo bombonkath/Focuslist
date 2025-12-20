@@ -334,7 +334,8 @@ body {
     align-items: center;
 }
 
-.date-input {
+.date-input,
+.time-input {
     padding: 1rem;
     border: 1px solid #ddd;
     border-radius: 12px;
@@ -344,7 +345,8 @@ body {
     min-width: 150px;
 }
 
-.date-input:focus {
+.date-input:focus,
+.time-input:focus {
     border-color: #DDA0DD;
 }
 
@@ -1234,6 +1236,7 @@ body.dark-theme .category-select {
 
 body.dark-theme .task-input:focus,
 body.dark-theme .date-input:focus,
+body.dark-theme .time-input:focus,
 body.dark-theme .category-select:focus {
     border-color: #DDA0DD;
 }
@@ -1358,3 +1361,4 @@ body.dark-theme .mobile-sidebar-btn:hover {
     background-color: #3d3d3d;
     color: #e0e0e0;
 }
+

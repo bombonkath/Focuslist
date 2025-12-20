@@ -312,7 +312,7 @@ function handleForgotPassword() {
         showNotification(`Se ha enviado un enlace de recuperación a ${emailInput}`);
         
         // Simulación: mostrar contraseña (solo para desarrollo)
-        if (confirm('¿Deseas ver tu contraseña? (Solo para desarrollo)')) {
+        if (confirm('¿Deseas ver tu contraseña? (Solo para desarrollo)\n\n⚠️ En producción, esto se enviaría por email.')) {
             alert(`Tu contraseña es: ${user.password}\n\n⚠️ En producción, esto se enviaría por email.`);
         }
     } else {
@@ -328,7 +328,7 @@ function handleForgotPassword() {
         showNotification(`Se ha enviado un enlace de recuperación a ${email}`);
         
         // Simulación: mostrar contraseña (solo para desarrollo)
-        if (confirm('¿Deseas ver tu contraseña? (Solo para desarrollo)')) {
+        if (confirm('¿Deseas ver tu contraseña? (Solo para desarrollo)\n\n⚠️ En producción, esto se enviaría por email.')) {
             alert(`Tu contraseña es: ${user.password}\n\n⚠️ En producción, esto se enviaría por email.`);
         }
     }

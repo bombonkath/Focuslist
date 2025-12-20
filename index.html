@@ -36,9 +36,9 @@
             <button class="mobile-sidebar-btn" id="mobileSidebarBtn">
                 <i class="fas fa-plus-circle"></i>
             </button>
-            <div class="notification-icon">
+            <button class="notification-icon" id="notificationPermissionBtn" title="Habilitar notificaciones">
                 <i class="fas fa-bell"></i>
-            </div>
+            </button>
             <button class="logout-btn" id="logoutBtn" title="Cerrar sesión">
                 <i class="fas fa-sign-out-alt"></i>
             </button>
@@ -112,6 +112,7 @@
             <div class="add-task-section">
                 <input type="text" placeholder="+ Añadir una nueva tarea..." class="task-input">
                 <input type="date" class="date-input" id="taskDate">
+                <input type="time" class="time-input" id="taskTime" title="Hora de recordatorio">
                 <select class="category-select" id="taskCategory">
                     <option value="Personal">Personal</option>
                     <option value="Trabajo">Trabajo</option>
@@ -219,7 +220,6 @@
             </div>
         </aside>
     </div>
-
 
     <script src="script.js"></script>
 </body>

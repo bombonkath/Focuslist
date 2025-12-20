@@ -72,6 +72,8 @@ function initializeApp() {
     updateUrgentTasks();
     setupLogout();
     setupStorageSync(); // Sincronización entre pestañas
+    initializeNotifications(); // Inicializar sistema de notificaciones
+    startReminderChecker(); // Iniciar verificador de recordatorios
 }
 
 function setupLogout() {
@@ -89,8 +91,25 @@ function setupLogout() {
     }
 }
 
+// Función auxiliar para obtener la fecha de hoy en formato local (YYYY-MM-DD)
+function getTodayLocalDate() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Mes es 0-indexado, sumar 1
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Función auxiliar para convertir un objeto Date a formato local (YYYY-MM-DD)
+function getTodayLocalDateFromDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function setupDateInputs() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayLocalDate(); // Usar función que obtiene fecha local
     const taskDateInput = document.getElementById('taskDate');
     
     if (taskDateInput) {
@@ -163,6 +182,14 @@ function setupEventListeners() {
     searchInput.addEventListener('input', function() {
         searchTasks(this.value);
     });
+
+    // Botón de permisos de notificaciones
+    const notificationBtn = document.getElementById('notificationPermissionBtn');
+    if (notificationBtn) {
+        notificationBtn.addEventListener('click', function() {
+            requestNotificationPermission();
+        });
+    }
 }
 
 // Funciones de persistencia de datos
@@ -207,7 +234,8 @@ function loadTasks() {
                 completed: task.completed || false,
                 tags: task.tags || [],
                 category: task.category || 'Personal',
-                dueDate: task.dueDate || new Date().toISOString().split('T')[0],
+                dueDate: task.dueDate || getTodayLocalDate(),
+                reminderTime: task.reminderTime || null, // Incluir hora de recordatorio
                 priority: task.priority || 'medium'
             }));
         } else {
@@ -226,9 +254,11 @@ function loadTasks() {
 function addNewTask() {
     const taskInput = document.querySelector('.task-input');
     const dateInput = document.getElementById('taskDate');
+    const timeInput = document.getElementById('taskTime'); // Nuevo: selector de hora
     const categorySelect = document.getElementById('taskCategory');
     const taskText = taskInput.value.trim();
     const selectedDate = dateInput.value;
+    const selectedTime = timeInput ? timeInput.value : ''; // Obtener hora seleccionada
     const selectedCategory = categorySelect ? categorySelect.value : 'Personal';
     
     if (taskText) {
@@ -238,14 +268,25 @@ function addNewTask() {
             completed: false,
             tags: [selectedCategory],
             category: selectedCategory,
-            dueDate: selectedDate || new Date().toISOString().split('T')[0], // Usar fecha seleccionada o hoy por defecto
+            dueDate: selectedDate || getTodayLocalDate(), // Usar fecha seleccionada o hoy por defecto
+            reminderTime: selectedTime || null, // Guardar hora de recordatorio (null si no se especifica)
             priority: "medium"
         };
         
         tasks.push(newTask);
         saveTasks(); // Guardar después de agregar
+        
+        // Debug: mostrar información de la tarea creada
+        console.log('Tarea creada:', {
+            text: newTask.text,
+            dueDate: newTask.dueDate,
+            reminderTime: newTask.reminderTime,
+            fechaHoy: getTodayLocalDate()
+        });
+        
         taskInput.value = '';
-        dateInput.value = ''; // Limpiar el selector de fecha pero mantener la categoría
+        dateInput.value = ''; // Limpiar el selector de fecha
+        if (timeInput) timeInput.value = ''; // Limpiar el selector de hora
         renderTasks();
         updateTaskCounts();
         updateDailyProgress();
@@ -256,7 +297,7 @@ function addNewTask() {
 
 // Funciones de progreso y urgentes
 function updateDailyProgress() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayLocalDate();
     const todayTasks = tasks.filter(task => task.dueDate === today);
     const completedTasks = todayTasks.filter(task => task.completed);
     const totalToday = todayTasks.length;
@@ -290,8 +331,10 @@ function updateDailyProgress() {
 }
 
 function updateUrgentTasks() {
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const today = getTodayLocalDate();
+    const tomorrowDate = new Date();
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    const tomorrow = getTodayLocalDateFromDate(tomorrowDate);
     
     // Tareas que vencen hoy o mañana (solo pendientes)
     const urgentTasks = tasks.filter(task => {
@@ -392,6 +435,7 @@ function renderTasks() {
                 <div class="task-tags">
                     ${task.tags.map(tag => `<span class="tag" style="background-color: ${getTagColor(tag)};">${tag}</span>`).join('')}
                     <span class="tag" style="background-color: ${getDueDateColor(task.dueDate)};">${formatDueDate(task.dueDate)}</span>
+                    ${task.reminderTime ? `<span class="tag" style="background-color: #4A90E2;"><i class="fas fa-clock"></i> ${task.reminderTime.substring(0, 5)}</span>` : ''}
                 </div>
             </div>
             <div class="task-actions">
@@ -405,9 +449,11 @@ function renderTasks() {
 function getFilteredTasks() {
     let filtered = tasks;
     
-    // Filtrar por lista
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    // Filtrar por lista - usar fecha local, no UTC
+    const today = getTodayLocalDate(); // Usar función que obtiene fecha local
+    const tomorrowDate = new Date();
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1); // Sumar 1 día
+    const tomorrow = getTodayLocalDateFromDate(tomorrowDate); // Convertir a formato local
     
     switch(currentFilter) {
         case 'Hoy':
@@ -517,8 +563,10 @@ function getTagColor(tag) {
 }
 
 function formatDueDate(dueDate) {
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const today = getTodayLocalDate();
+    const tomorrowDate = new Date();
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    const tomorrow = getTodayLocalDateFromDate(tomorrowDate);
     const taskDate = new Date(dueDate);
     const todayDate = new Date(today);
     
@@ -544,8 +592,10 @@ function formatDueDate(dueDate) {
 }
 
 function getDueDateColor(dueDate) {
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const today = getTodayLocalDate();
+    const tomorrowDate = new Date();
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    const tomorrow = getTodayLocalDateFromDate(tomorrowDate);
     const taskDate = new Date(dueDate);
     const todayDate = new Date(today);
     
@@ -568,7 +618,7 @@ function getDueDateColor(dueDate) {
 }
 
 function updateTaskCounts() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayLocalDate();
     
     // Tareas que vencen hoy (completadas y pendientes)
     const todayCount = tasks.filter(t => t.dueDate === today).length;
@@ -818,3 +868,248 @@ function applyAccentColor(color, colorHover) {
     
     document.head.appendChild(style);
 }
+
+// ============================================
+// SISTEMA DE NOTIFICACIONES Y RECORDATORIOS
+// ============================================
+
+// Variable para almacenar el intervalo del verificador de recordatorios
+let reminderInterval = null;
+
+// Función para inicializar el sistema de notificaciones
+function initializeNotifications() {
+    // Verificar si el navegador soporta notificaciones
+    if (!('Notification' in window)) {
+        console.log('Este navegador no soporta notificaciones del sistema');
+        return; // Si no soporta, salir de la función
+    }
+    
+    // Verificar el estado actual del permiso
+    const permission = Notification.permission;
+    
+    // Si el permiso es "default" (aún no se ha preguntado), solicitar permiso
+    if (permission === 'default') {
+        // Mostrar un mensaje informativo al usuario
+        console.log('Las notificaciones están disponibles. Se solicitará permiso cuando sea necesario.');
+    } else if (permission === 'granted') {
+        // Si ya tiene permiso, mostrar mensaje de confirmación
+        console.log('Permisos de notificación concedidos');
+    } else if (permission === 'denied') {
+        // Si el permiso fue denegado, informar al usuario
+        console.log('Permisos de notificación denegados');
+    }
+}
+
+// Función para solicitar permiso de notificaciones
+function requestNotificationPermission() {
+    // Verificar si el navegador soporta notificaciones
+    if (!('Notification' in window)) {
+        showNotification('Tu navegador no soporta notificaciones');
+        return Promise.resolve(false); // Retornar promesa resuelta con false
+    }
+    
+    // Si ya tiene permiso concedido, retornar true
+    if (Notification.permission === 'granted') {
+        return Promise.resolve(true);
+    }
+    
+    // Si el permiso fue denegado, informar al usuario
+    if (Notification.permission === 'denied') {
+        showNotification('Los permisos de notificación fueron denegados. Por favor, habilítalos en la configuración del navegador.');
+        return Promise.resolve(false);
+    }
+    
+    // Solicitar permiso al usuario (solo funciona si es "default")
+    return Notification.requestPermission().then(function(permission) {
+        // permission puede ser: "granted", "denied", o "default"
+        if (permission === 'granted') {
+            showNotification('Notificaciones habilitadas correctamente');
+            return true;
+        } else {
+            showNotification('Permisos de notificación denegados');
+            return false;
+        }
+    });
+}
+
+// Función para mostrar una notificación del navegador
+function showBrowserNotification(title, options) {
+    // Verificar si el navegador soporta notificaciones
+    if (!('Notification' in window)) {
+        console.log('Este navegador no soporta notificaciones');
+        return; // Salir si no soporta
+    }
+    
+    // Verificar si tiene permiso
+    if (Notification.permission !== 'granted') {
+        // Si no tiene permiso, solicitarlo primero
+        requestNotificationPermission().then(function(hasPermission) {
+            if (hasPermission) {
+                // Si se concedió el permiso, crear la notificación
+                createNotification(title, options);
+            }
+        });
+        return; // Salir de la función
+    }
+    
+    // Si ya tiene permiso, crear la notificación directamente
+    createNotification(title, options);
+}
+
+// Función auxiliar para crear la notificación
+function createNotification(title, options) {
+    // Opciones por defecto para la notificación
+    const defaultOptions = {
+        body: '', // Cuerpo del mensaje
+        icon: '/favicon.ico', // Icono (si existe)
+        badge: '/favicon.ico', // Badge para móviles
+        tag: 'task-reminder', // Tag para agrupar notificaciones similares
+        requireInteraction: false, // Si es true, requiere interacción del usuario
+        silent: false // Si es true, no reproduce sonido
+    };
+    
+    // Combinar opciones por defecto con las opciones proporcionadas
+    const notificationOptions = { ...defaultOptions, ...options };
+    
+    // Crear la notificación
+    const notification = new Notification(title, notificationOptions);
+    
+    // Cuando el usuario hace click en la notificación, enfocar la ventana
+    notification.onclick = function() {
+        window.focus(); // Enfocar la ventana del navegador
+        notification.close(); // Cerrar la notificación
+    };
+    
+    // Cerrar automáticamente después de 5 segundos
+    setTimeout(function() {
+        notification.close();
+    }, 5000);
+}
+
+// Variable para rastrear recordatorios ya mostrados (evitar duplicados)
+let shownReminders = new Set();
+
+// Función para iniciar el verificador de recordatorios
+function startReminderChecker() {
+    // Si ya hay un intervalo activo, no crear otro
+    if (reminderInterval) {
+        return; // Salir si ya está corriendo
+    }
+    
+    // Verificar recordatorios inmediatamente al iniciar
+    checkReminders();
+    
+    // Verificar recordatorios cada 30 segundos (30000 milisegundos)
+    // Esto permite detectar recordatorios más rápido
+    reminderInterval = setInterval(function() {
+        checkReminders();
+    }, 30000); // 30000ms = 30 segundos
+}
+
+// Función para detener el verificador de recordatorios
+function stopReminderChecker() {
+    // Si hay un intervalo activo, detenerlo
+    if (reminderInterval) {
+        clearInterval(reminderInterval); // Limpiar el intervalo
+        reminderInterval = null; // Establecer a null
+    }
+}
+
+// Función para verificar y mostrar recordatorios
+function checkReminders() {
+    // Obtener la fecha y hora actual
+    const now = new Date();
+    const currentDate = getTodayLocalDate(); // Fecha en formato YYYY-MM-DD (local)
+    const currentTime = now.toTimeString().split(' ')[0].substring(0, 5); // Hora en formato HH:MM
+    
+    // Debug: mostrar información de verificación
+    console.log('Verificando recordatorios:', {
+        fechaActual: currentDate,
+        horaActual: currentTime,
+        totalTareas: tasks.length,
+        tareasConRecordatorio: tasks.filter(t => t.reminderTime).length
+    });
+    
+    // Convertir hora actual a minutos desde medianoche para comparación
+    const [currentHour, currentMinute] = currentTime.split(':').map(Number);
+    const currentMinutes = currentHour * 60 + currentMinute;
+    
+    // Filtrar tareas que tienen recordatorio configurado
+    const tasksWithReminders = tasks.filter(function(task) {
+        // Debe tener hora de recordatorio
+        if (!task.reminderTime) {
+            return false; // Si no tiene hora, no incluir
+        }
+        
+        // No debe estar completada
+        if (task.completed) {
+            return false; // Si está completada, no incluir
+        }
+        
+        // La fecha de vencimiento debe ser hoy
+        if (task.dueDate !== currentDate) {
+            return false; // Si no es hoy, no incluir
+        }
+        
+        // Obtener hora de recordatorio en formato HH:MM
+        const reminderTime = task.reminderTime.substring(0, 5);
+        const [reminderHour, reminderMinute] = reminderTime.split(':').map(Number);
+        const reminderMinutes = reminderHour * 60 + reminderMinute;
+        
+        // Crear clave única para este recordatorio (taskId + fecha + hora)
+        const reminderKey = `${task.id}-${task.dueDate}-${reminderTime}`;
+        
+        // Verificar si este recordatorio ya fue mostrado
+        if (shownReminders.has(reminderKey)) {
+            return false; // Si ya se mostró, no incluir
+        }
+        
+        // Verificar si la hora de recordatorio ya pasó o es ahora (con margen de 1 minuto)
+        // Esto permite mostrar recordatorios que ya pasaron pero no se han mostrado
+        const timeDifference = currentMinutes - reminderMinutes;
+        
+        // Mostrar si la hora coincide exactamente o si pasó hace menos de 1 minuto
+        if (timeDifference >= 0 && timeDifference <= 1) {
+            // Marcar como mostrado para evitar duplicados
+            shownReminders.add(reminderKey);
+            return true; // Incluir esta tarea
+        }
+        
+        return false; // Si no cumple las condiciones, no incluir
+    });
+    
+    // Para cada tarea con recordatorio, mostrar notificación
+    tasksWithReminders.forEach(function(task) {
+        // Crear título de la notificación
+        const notificationTitle = 'Recordatorio de tarea';
+        
+        // Crear cuerpo del mensaje
+        const notificationBody = `${task.text}\nCategoría: ${task.category}`;
+        
+        // Mostrar la notificación del navegador
+        showBrowserNotification(notificationTitle, {
+            body: notificationBody, // Mensaje de la notificación
+            icon: '/favicon.ico', // Icono (si existe)
+            tag: `task-${task.id}`, // Tag único por tarea
+            requireInteraction: false // No requiere interacción
+        });
+        
+        // También mostrar notificación visual en la app
+        showNotification(`Recordatorio: ${task.text}`);
+    });
+    
+    // Limpiar recordatorios antiguos (de días anteriores) del Set
+    // Esto evita que el Set crezca indefinidamente
+    const keysToRemove = [];
+    shownReminders.forEach(function(key) {
+        const keyParts = key.split('-');
+        const reminderDate = keyParts[1]; // La fecha está en la segunda parte
+        if (reminderDate !== currentDate) {
+            keysToRemove.push(key); // Marcar para eliminar
+        }
+    });
+    keysToRemove.forEach(function(key) {
+        shownReminders.delete(key); // Eliminar del Set
+    });
+}
+
